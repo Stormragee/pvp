@@ -1,0 +1,89 @@
+name: PVP
+author: SkepsonSk
+version: 1.0-SNAPSHOT
+depend: [PlaceholderAPI, HolographicDisplays]
+
+main: pl.trollcraft.pvp.PVP
+
+commands:
+  kit:
+    description: Kit.
+  kitadmin:
+    description: Kit Admin.
+  kitgive:
+    description: Kit Give.
+  warp:
+    description: Warp.
+  setwarp:
+    description: Set Warp.
+  delwarp:
+    description: Del Warp.
+  warehouse:
+    description: Warehouse.
+    aliases: [magazyn]
+  portal:
+    description: Portal.
+  signshop:
+    description: Sign Shop.
+  money:
+    description: Money.
+  economy:
+    description: Economy.
+  pay:
+    description: Pay.
+  clan:
+    description: Clan.
+    aliases: [klan, kl]
+  clanadmin:
+    description: Clan Admin.
+  ranking:
+    description: Ranking.
+  holoranking:
+    description: Holo Ranking.
+  plot:
+    description: Plot.
+    aliases: [dzialka]
+  chat:
+    description: Chat.
+  message:
+    description: Message.
+    aliases: [msg, tell]
+  respond:
+    description: Respond to message command.
+    aliases: [r, resp]
+  broadcast:
+    description: Broadcast.
+  spawn:
+    description: Spawn.
+  dodaj:
+    description: Dodaj.
+  usun:
+    description: Usun.
+  zaufaj:
+    description: Zaufaj.
+  nieufaj:
+    description: Nieufaj.
+  repair:
+    description: Repair.
+    aliases: [napraw]
+  zablokuj:
+    description: Zablokuj.
+  odblokuj:
+    description: Odblokuj
+  dzialki:
+    description: Dzialki.
+  dinfo:
+    description: Info.
+  booster:
+    description: Booster
+  boosteradmin:
+    description: Booster Admin.
+  incognito:
+    description: Incognito.
+  cmd:
+    description: Cmd Blacklist.
+  aukcja:
+    description: Aukcja
+    aliases: [auk, aukc, aukcje]
+  test:
+    description: Gwalt.

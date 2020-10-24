@@ -1,0 +1,5 @@
+defaults:
+  player: none
+  vip: none
+  svip: none
+kits: {}

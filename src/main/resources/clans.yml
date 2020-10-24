@@ -1,0 +1,7 @@
+clan:
+  max: 5
+  required:
+    money: 2500
+    kills: 500
+
+clans: {}
