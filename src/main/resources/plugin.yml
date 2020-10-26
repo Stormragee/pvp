@@ -36,8 +36,10 @@ commands:
     aliases: [klan, kl]
   clanadmin:
     description: Clan Admin.
-  ranking:
+  rankingadm:
     description: Ranking.
+  ranking:
+    description: Ranking in GUI.
   holoranking:
     description: Holo Ranking.
   plot:
@@ -87,3 +89,11 @@ commands:
     aliases: [auk, aukc, aukcje]
   test:
     description: Gwalt.
+  wtp:
+    description: Teleports to the defined world.
+  fly:
+    description: Flying command.
+  reset:
+    description: Reset kills and deaths.
+  fp:
+    description: Force Promotion.

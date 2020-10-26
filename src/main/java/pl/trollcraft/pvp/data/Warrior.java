@@ -1,6 +1,10 @@
 package pl.trollcraft.pvp.data;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import pl.trollcraft.pvp.data.events.WarriorLevelUpEvent;
+import pl.trollcraft.pvp.data.levels.Level;
+import pl.trollcraft.pvp.data.levels.LevelsManager;
 
 import java.text.DecimalFormat;
 
@@ -47,14 +51,39 @@ public class Warrior {
     public void addKill() { kills++; killStreak++; updateKdr(); }
     public void addDeath() { deaths++; killStreak = 0; updateKdr(); }
 
+    public void reset() {
+        kills = 0;
+        deaths = 0;
+    }
+
+    public boolean canReset() {
+        return kills > 0 && deaths > 0;
+    }
 
     public boolean tryPromote() {
         if (nextLevel == null) return false;
         if (kills >= nextLevel.getRequiredKills()){
             level++;
             nextLevel = LevelsManager.get(level + 1);
+            Bukkit.getPluginManager().callEvent(new WarriorLevelUpEvent(this, level));
             return true;
         }
         return false;
     }
+
+    /**
+     * Debug only
+     * @return boolean
+     */
+    public boolean forcePromote() {
+        level++;
+        nextLevel = LevelsManager.get(level + 1);
+        Bukkit.getPluginManager().callEvent(new WarriorLevelUpEvent(this, level));
+        return true;
+    }
+
+    public void resetLevel() {
+        level = 0;
+    }
+
 }

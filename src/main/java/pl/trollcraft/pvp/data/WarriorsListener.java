@@ -23,7 +23,10 @@ public class WarriorsListener implements Listener {
     public void onQuit (PlayerQuitEvent event) {
         Warrior warrior = WarriorsManager.get(event.getPlayer());
         if (warrior == null) return;
-        //WarriorsManager.save(warrior);
+
+        //TODO warriors not saving?
+        WarriorsManager.save(warrior);
+
         WarriorsManager.unregister(warrior);
     }
 

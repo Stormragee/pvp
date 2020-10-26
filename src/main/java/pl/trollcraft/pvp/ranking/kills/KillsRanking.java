@@ -51,7 +51,7 @@ public class KillsRanking extends Ranking {
             }
         }
         position = new KillsPosition(name, 0);
-        insertNew(position);
+        insertNew(player, position);
         playersPositions.put(player, position);
         return positions.size();
     }

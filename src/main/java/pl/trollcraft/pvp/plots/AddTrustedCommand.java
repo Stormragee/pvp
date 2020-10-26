@@ -21,32 +21,13 @@ public class AddTrustedCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        PlotPlayer plotPlayer = PlotPlayer.wrap(player);
 
-        if (plotPlayer.getPlotCount() == 0) {
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&cNie posiadasz zadnej dzialki."));
-            return true;
-        }
 
-        OfflinePlayer trusted;
-        if (args.length == 1){
-            trusted = Bukkit.getOfflinePlayer(args[0]);
-            if (trusted == null) {
-                ChatUtils.sendMessage(player, ChatUtils.fixColor("&cBrak takiego gracza."));
-                return true;
-            }
-        }
-        else {
+        if (args.length == 1)
+            player.performCommand(String.format("p trust %s", args[0]));
+
+        else
             ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/zaufaj <gracz>"));
-            return true;
-        }
-
-        for (Plot plot : plotPlayer.getPlots()){
-            plot.addTrusted(trusted.getUniqueId());
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&aDodano gracza &e" + trusted.getName() + " &ado zaufanych dzialki\n" +
-                    "&7Aby usunac gracza z listy zaufanych uzyj &e/nieufaj <gracz>."));
-            return true;
-        }
 
         return true;
     }

@@ -49,7 +49,7 @@ public class EconomyRanking extends Ranking {
             }
         }
         position = new EconomyPosition(name, 0);
-        insertNew(position);
+        insertNew(player, position);
         playersPositions.put(player, position);
         return positions.size();
     }

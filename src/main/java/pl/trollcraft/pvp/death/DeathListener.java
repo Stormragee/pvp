@@ -36,6 +36,7 @@ public class DeathListener implements Listener {
 
         if (damager.getType() == EntityType.PLAYER) {
             damagerPlayer = (Player) damager;
+
             if (death(victimPlayer, event.getFinalDamage())) {
                 event.setCancelled(true);
                 victimPlayer.sendTitle(ChatUtils.fixColor("&cUmierasz"),
@@ -138,17 +139,20 @@ public class DeathListener implements Listener {
     private void drop(Player player) {
         World world = player.getWorld();
         Location loc = player.getLocation();
+
         for (ItemStack itemStack : player.getInventory()) {
             if (itemStack == null || itemStack.getType() == Material.AIR) continue;
             if (itemStack.getType().name().contains("IRON")) continue;
             if (itemStack.getType() == Material.ARROW) continue;
             world.dropItem(loc, itemStack);
         }
+
         for (ItemStack itemStack : player.getInventory().getArmorContents()) {
             if (itemStack == null || itemStack.getType() == Material.AIR) continue;
             if (itemStack.getType().name().contains("IRON")) continue;
             world.dropItem(loc, itemStack);
         }
+
         player.getInventory().clear();
     }
 

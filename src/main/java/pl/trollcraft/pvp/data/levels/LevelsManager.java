@@ -1,4 +1,4 @@
-package pl.trollcraft.pvp.data;
+package pl.trollcraft.pvp.data.levels;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import pl.trollcraft.pvp.help.Configs;
@@ -13,6 +13,7 @@ public class LevelsManager {
 
     public static void load() {
         YamlConfiguration conf = Configs.load("levels.yml");
+        assert conf != null;
 
         conf.getConfigurationSection("levels").getKeys(false).forEach( lvl -> {
             int level = Integer.parseInt(lvl);

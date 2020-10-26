@@ -1,9 +1,8 @@
 package pl.trollcraft.pvp;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.trollcraft.pvp.antylogout.AntyLogout;
+import pl.trollcraft.pvp.antylogout.AntyLogoutData;
 import pl.trollcraft.pvp.antylogout.AntyLogoutListener;
 import pl.trollcraft.pvp.auctions.AuctionCommand;
 import pl.trollcraft.pvp.auctions.AuctionManager;
@@ -22,17 +21,21 @@ import pl.trollcraft.pvp.clans.ClansManager;
 import pl.trollcraft.pvp.cmds.CmdListener;
 import pl.trollcraft.pvp.cmds.CmdManager;
 import pl.trollcraft.pvp.cmds.CmdsCommand;
-import pl.trollcraft.pvp.data.LevelsManager;
-import pl.trollcraft.pvp.data.WarriorsManager;
+import pl.trollcraft.pvp.data.*;
+import pl.trollcraft.pvp.data.levels.LevelsDebugCommand;
+import pl.trollcraft.pvp.data.levels.LevelsManager;
+import pl.trollcraft.pvp.data.rewards.RewardsListener;
+import pl.trollcraft.pvp.data.rewards.RewardsManager;
 import pl.trollcraft.pvp.death.KillsManager;
 import pl.trollcraft.pvp.economy.EconomyManager;
 import pl.trollcraft.pvp.help.*;
-import pl.trollcraft.pvp.data.WarriorsListener;
 import pl.trollcraft.pvp.death.DeathListener;
 import pl.trollcraft.pvp.economy.EconomyListener;
 import pl.trollcraft.pvp.economy.commands.EconomyCommand;
 import pl.trollcraft.pvp.economy.commands.MoneyCommand;
 import pl.trollcraft.pvp.economy.commands.PayCommand;
+import pl.trollcraft.pvp.help.flying.FlyCommand;
+import pl.trollcraft.pvp.help.flying.FlyingListener;
 import pl.trollcraft.pvp.help.gui.InventoryListener;
 import pl.trollcraft.pvp.help.move.MoveDetect;
 import pl.trollcraft.pvp.help.tasks.OfflineTask;
@@ -57,9 +60,7 @@ import pl.trollcraft.pvp.scoreboard.ScoreboardListener;
 import pl.trollcraft.pvp.signshop.SignShopCommand;
 import pl.trollcraft.pvp.signshop.SignShopsListener;
 import pl.trollcraft.pvp.signshop.SignShopsManager;
-import pl.trollcraft.pvp.warehouses.WarehouseCommand;
 import pl.trollcraft.pvp.warehouses.WarehousesListener;
-import pl.trollcraft.pvp.warehouses.WarehousesManager;
 import pl.trollcraft.pvp.warp.*;
 import pl.trollcraft.pvp.warp.commands.DelWarpCommand;
 import pl.trollcraft.pvp.warp.commands.SetWarpCommand;
@@ -81,27 +82,59 @@ public class PVP extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-        saveConfig();
 
         getLogger().log(Level.INFO, "PVP is enabling, it may take up to few minutes.");
 
+        getLogger().log(Level.INFO, "Loading config...");
+        ConfigData.load();
+
+        getLogger().log(Level.INFO, "Loading move detect...");
         MoveDetect.listen();
         DelayedWarp.listen();
+
+        getLogger().log(Level.INFO, "Loading kits...");
         KitsManager.load();
-        WarehousesManager.load();
+
+        getLogger().log(Level.INFO, "Loading warps...");
         Warp.load();
+
+        getLogger().log(Level.INFO, "Loading sign shops...");
         SignShopsManager.load();
+
+        getLogger().log(Level.INFO, "Loading portals...");
         PortalsManager.load();
+
         PortalsHandler.listen();
+
+        getLogger().log(Level.INFO, "Loading auto messages...");
         AutoMessages.init();
+
+        getLogger().log(Level.INFO, "Loading levels data...");
         LevelsManager.load();
+
+        getLogger().log(Level.INFO, "Loading clans...");
         ClansManager.load();
+
         KillsManager.listen();
         Booster.listen();
+
+        getLogger().log(Level.INFO, "Loading blocked commands...");
         CmdManager.load();
+
+        getLogger().log(Level.INFO, "Loading auctions...");
         AuctionManager.load();
+
+        getLogger().log(Level.INFO, "Loading offline tasks...");
         OfflineTask.load();
         AuctionItemManager.startTicker();
+
+        getLogger().log(Level.INFO, "Loading antylogout data...");
+        AntyLogoutData.load();
+
+        getLogger().log(Level.INFO, "Loading rewards...");
+        RewardsManager.load();
+
+        getLogger().log(Level.INFO, "PVP base loaded. Loading extras.");
 
         AntyLogout.newInstance(1000 * 15);
         killsRanking = new KillsRanking();
@@ -109,6 +142,7 @@ public class PVP extends JavaPlugin {
         RankingManager.register(killsRanking);
         RankingManager.register(economyRanking);
         HoloRankingsManager.load();
+        FlyingListener.listen();
 
         new PlaceholderManager().register();
 
@@ -118,7 +152,6 @@ public class PVP extends JavaPlugin {
         getCommand("warp").setExecutor(new WarpCommand());
         getCommand("setwarp").setExecutor(new SetWarpCommand());
         getCommand("delwarp").setExecutor(new DelWarpCommand());
-        //getCommand("warehouse").setExecutor(new WarehouseCommand());
         getCommand("portal").setExecutor(new PortalSetupCommand());
         getCommand("signshop").setExecutor(new SignShopCommand());
         getCommand("money").setExecutor(new MoneyCommand());
@@ -126,7 +159,10 @@ public class PVP extends JavaPlugin {
         getCommand("pay").setExecutor(new PayCommand());
         getCommand("clan").setExecutor(new ClansCommand());
         getCommand("clanadmin").setExecutor(new ClansAdminCommand());
-        getCommand("ranking").setExecutor(new RankingCommand());
+
+        getCommand("rankingadm").setExecutor(new RankingCommand());
+        getCommand("ranking").setExecutor(new pl.trollcraft.pvp.ranking.commands.RankingCommand());
+
         getCommand("holoranking").setExecutor(new HoloRankingsCommand());
         getCommand("plot").setExecutor(new PlotCommand());
         getCommand("message").setExecutor(new MessageCommand());
@@ -139,16 +175,15 @@ public class PVP extends JavaPlugin {
         getCommand("usun").setExecutor(new RemovePlayerCommand());
         getCommand("nieufaj").setExecutor(new UntrustPlayerCommand());
         getCommand("repair").setExecutor(new RepairCommand());
-        getCommand("zablokuj").setExecutor(new LockCommand());
-        getCommand("odblokuj").setExecutor(new UnlockCommand());
-        getCommand("dzialki").setExecutor(new PlotsCommand());
         getCommand("dinfo").setExecutor(new PlotInfoCommand());
         getCommand("booster").setExecutor(new BoosterCommand());
         getCommand("boosteradmin").setExecutor(new BoosterAdminCommand());
         getCommand("cmd").setExecutor(new CmdsCommand());
         getCommand("incognito").setExecutor(new IncognitoCommand());
         getCommand("aukcja").setExecutor(new AuctionCommand());
-        getCommand("test").setExecutor(new TestCommand());
+        getCommand("fly").setExecutor(new FlyCommand());
+        getCommand("reset").setExecutor(new ResetCommand());
+        getCommand("fp").setExecutor(new LevelsDebugCommand());
 
         getServer().getPluginManager().registerEvents(new SpawnListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
@@ -169,6 +204,7 @@ public class PVP extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new IncognitoListener(), this);
         getServer().getPluginManager().registerEvents(new OfflineTaskListener(), this);
         getServer().getPluginManager().registerEvents(new AuctionViewListener(), this);
+        getServer().getPluginManager().registerEvents(new RewardsListener(), this);
 
         AntyLogoutListener antyLogoutListener = new AntyLogoutListener();
         antyLogoutListener.listen();

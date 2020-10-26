@@ -1,4 +1,4 @@
-package pl.trollcraft.pvp.data;
+package pl.trollcraft.pvp.data.levels;
 
 public class Level {
 

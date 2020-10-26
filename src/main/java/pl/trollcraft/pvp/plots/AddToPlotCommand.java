@@ -21,32 +21,12 @@ public class AddToPlotCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        PlotPlayer plotPlayer = PlotPlayer.wrap(player);
 
-        if (plotPlayer.getPlotCount() == 0) {
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&cNie posiadasz zadnej dzialki."));
-            return true;
-        }
+        if (args.length == 1)
+            player.performCommand(String.format("p add %s", args[0]));
 
-        OfflinePlayer added;
-        if (args.length == 1){
-            added = Bukkit.getOfflinePlayer(args[0]);
-            if (added == null) {
-                ChatUtils.sendMessage(player, ChatUtils.fixColor("&cBrak takiego gracza."));
-                return true;
-            }
-        }
-        else {
+        else
             ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/dodaj <gracz>"));
-            return true;
-        }
-
-        for (Plot plot : plotPlayer.getPlots()){
-            plot.addMember(added.getUniqueId());
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&aDodano gracza &e" + added.getName() + " &ado dzialki\n" +
-                    "&7Aby usunac gracza z dzialki uzyj &e/usun <gracz>."));
-            return true;
-        }
 
         return true;
     }

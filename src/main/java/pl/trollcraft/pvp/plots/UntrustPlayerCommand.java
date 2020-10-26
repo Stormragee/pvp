@@ -21,31 +21,14 @@ public class UntrustPlayerCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        PlotPlayer plotPlayer = PlotPlayer.wrap(player);
 
-        if (plotPlayer.getPlotCount() == 0) {
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&cNie posiadasz zadnej dzialki."));
-            return true;
-        }
+        if (args.length == 1)
+            player.performCommand(String.format("p untrust %s", args[0]));
 
-        OfflinePlayer untrusted;
-        if (args.length == 1){
-            untrusted = Bukkit.getOfflinePlayer(args[0]);
-            if (untrusted == null) {
-                ChatUtils.sendMessage(player, ChatUtils.fixColor("&cBrak takiego gracza."));
-                return true;
-            }
-        }
-        else {
+        else
             ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/zaufaj <gracz>"));
-            return true;
-        }
 
-        for (Plot plot : plotPlayer.getPlots()){
-            plot.removeTrusted(untrusted.getUniqueId());
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&aUsunieto gracza &e" + untrusted.getName() + " &az listy zaufanych dzialki."));
-            return true;
-        }
+
 
         return true;
     }

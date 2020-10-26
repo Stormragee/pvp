@@ -1,0 +1,9 @@
+rewards:
+  '1':
+    type: money
+    data:
+      money: 100
+  '5':
+    type: money
+    data:
+      money: 500

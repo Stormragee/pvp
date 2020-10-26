@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import pl.trollcraft.pvp.PVP;
 import pl.trollcraft.pvp.help.ChatUtils;
+import pl.trollcraft.pvp.scoreboard.ScoreboardHandler;
 
 public class RankingListener implements Listener {
 
@@ -18,6 +19,12 @@ public class RankingListener implements Listener {
 
         ChatUtils.sendMessage(player, ChatUtils.fixColor("&aTwoj pozycja w rankingu zabojcow to &e&l" + killsPos + " miejsce."));
         ChatUtils.sendMessage(player, ChatUtils.fixColor("&aTwoj pozycja w rankingu bogaczy to &e&l" + ecoPos + " miejsce."));
+    }
+
+    @EventHandler
+    public void onRankingUpdate(RankingUpdateEvent event) {
+        Player player = event.getPlayer();
+        ScoreboardHandler.update(player);
     }
 
 }

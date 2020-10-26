@@ -24,7 +24,6 @@ public class ScoreboardListener implements Listener {
 
         }.runTask(PVP.getPlugin());
 
-
     }
 
 }

@@ -1,9 +1,5 @@
 package pl.trollcraft.pvp.plots;
 
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,31 +17,12 @@ public class RemovePlayerCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        PlotPlayer plotPlayer = PlotPlayer.wrap(player);
 
-        if (plotPlayer.getPlotCount() == 0) {
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&cNie posiadasz zadnej dzialki."));
-            return true;
-        }
+        if (args.length == 1)
+            player.performCommand(String.format("p remove %s", args[0]));
 
-        OfflinePlayer removed;
-        if (args.length == 1){
-            removed = Bukkit.getOfflinePlayer(args[0]);
-            if (removed == null) {
-                ChatUtils.sendMessage(player, ChatUtils.fixColor("&cBrak takiego gracza."));
-                return true;
-            }
-        }
-        else {
+        else
             ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/zaufaj <gracz>"));
-            return true;
-        }
-
-        for (Plot plot : plotPlayer.getPlots()){
-            plot.removeMember(removed.getUniqueId());
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&aUsunieto gracza &e" + removed.getName() + " &az dzialki."));
-            return true;
-        }
 
         return true;
     }

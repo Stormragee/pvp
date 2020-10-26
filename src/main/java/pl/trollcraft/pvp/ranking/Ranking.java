@@ -70,7 +70,7 @@ public abstract class Ranking {
             swap(position, position.getNext());
             pos = positions.indexOf(position)+1;
         }
-        Bukkit.getServer().getPluginManager().callEvent(new RankingUpdateEvent(this));
+        Bukkit.getServer().getPluginManager().callEvent(new RankingUpdateEvent(player, this));
         return pos;
     }
 
@@ -87,16 +87,16 @@ public abstract class Ranking {
             swap(position, position.getPrevious());
             pos = positions.indexOf(position)+1;
         }
-        Bukkit.getServer().getPluginManager().callEvent(new RankingUpdateEvent(this));
+        Bukkit.getServer().getPluginManager().callEvent(new RankingUpdateEvent(player, this));
         return pos;
     }
 
-    public void insertNew(Position position) {
+    public void insertNew(Player player, Position position) {
         int size = positions.size();
         positions.add(position);
         positions.get(size-2).setPrevious(positions.get(size-1));
         positions.get(size-1).setNext(positions.get(size-2));
-        Bukkit.getServer().getPluginManager().callEvent(new RankingUpdateEvent(this));
+        Bukkit.getServer().getPluginManager().callEvent(new RankingUpdateEvent(player, this));
     }
 
     public List<String> getPositions(int amount) {
@@ -112,6 +112,15 @@ public abstract class Ranking {
     public Position get(Player player) {
         if (playersPositions.containsKey(player)) return playersPositions.get(player);
         return null;
+    }
+
+    public int getIndex(Player player) {
+        Position pos = playersPositions.get(player);
+        return positions.indexOf(pos);
+    }
+
+    public int getIndex(Position position) {
+        return positions.indexOf(position);
     }
 
 }

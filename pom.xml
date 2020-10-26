@@ -62,6 +62,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/ProtocolLib.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>api.nick</groupId>
+            <artifactId>api.nick</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/NickAPI-v6.0.2.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>
