@@ -1,5 +1,6 @@
 package pl.trollcraft.pvp.clans;
 
+import com.nametagedit.plugin.NametagEdit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -17,6 +18,10 @@ public class ClansListener implements Listener {
     public void onJoin (PlayerJoinEvent event) {
         Player player = event.getPlayer();
         ClansManager.load(player);
+
+        Clan clan = ClansManager.get(player);
+        if (clan != null)
+            NametagEdit.getApi().setPrefix(player, "&e[" + clan.getName() + "] &f");
     }
 
     @EventHandler

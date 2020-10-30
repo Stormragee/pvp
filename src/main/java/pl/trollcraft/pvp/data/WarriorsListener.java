@@ -19,7 +19,7 @@ public class WarriorsListener implements Listener {
         WarriorsManager.load(event.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.HIGH)
     public void onQuit (PlayerQuitEvent event) {
         Warrior warrior = WarriorsManager.get(event.getPlayer());
         if (warrior == null) return;

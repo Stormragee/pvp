@@ -86,7 +86,7 @@ public class AntyLogout {
         long now = System.currentTimeMillis();
         long inCombat = combats.get(player);
 
-        return now >= inCombat;
+        return now <= inCombat;
     }
 
     /**

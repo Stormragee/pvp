@@ -69,6 +69,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/NickAPI-v6.0.2.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>api.nametag</groupId>
+            <artifactId>api.nametag</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/NametagEdit.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>

@@ -4,8 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
+import pl.trollcraft.pvp.clans.Clan;
+import pl.trollcraft.pvp.clans.ClansManager;
 import pl.trollcraft.pvp.data.Warrior;
 import pl.trollcraft.pvp.data.WarriorsManager;
+import pl.trollcraft.pvp.help.Help;
 import pl.trollcraft.pvp.ranking.Ranking;
 import pl.trollcraft.pvp.ranking.RankingManager;
 

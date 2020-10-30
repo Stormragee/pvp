@@ -97,3 +97,8 @@ commands:
     description: Reset kills and deaths.
   fp:
     description: Force Promotion.
+  enderchest:
+    description: Opens an enderchest.
+    aliases: [ec]
+  truenick:
+    description: Shows all nicknames in incognito mode.

@@ -28,6 +28,7 @@ import pl.trollcraft.pvp.data.rewards.RewardsListener;
 import pl.trollcraft.pvp.data.rewards.RewardsManager;
 import pl.trollcraft.pvp.death.KillsManager;
 import pl.trollcraft.pvp.economy.EconomyManager;
+import pl.trollcraft.pvp.essentials.EnderchestCommand;
 import pl.trollcraft.pvp.help.*;
 import pl.trollcraft.pvp.death.DeathListener;
 import pl.trollcraft.pvp.economy.EconomyListener;
@@ -41,7 +42,9 @@ import pl.trollcraft.pvp.help.move.MoveDetect;
 import pl.trollcraft.pvp.help.tasks.OfflineTask;
 import pl.trollcraft.pvp.help.tasks.OfflineTaskListener;
 import pl.trollcraft.pvp.incognito.IncognitoCommand;
+import pl.trollcraft.pvp.incognito.IncognitoData;
 import pl.trollcraft.pvp.incognito.IncognitoListener;
+import pl.trollcraft.pvp.incognito.TrueNickCommand;
 import pl.trollcraft.pvp.kits.commands.KitAdminCommand;
 import pl.trollcraft.pvp.kits.commands.KitCommand;
 import pl.trollcraft.pvp.kits.KitListener;
@@ -134,6 +137,9 @@ public class PVP extends JavaPlugin {
         getLogger().log(Level.INFO, "Loading rewards...");
         RewardsManager.load();
 
+        getLogger().log(Level.INFO, "Loading incognito nicknames...");
+        IncognitoData.load();
+
         getLogger().log(Level.INFO, "PVP base loaded. Loading extras.");
 
         AntyLogout.newInstance(1000 * 15);
@@ -184,6 +190,8 @@ public class PVP extends JavaPlugin {
         getCommand("fly").setExecutor(new FlyCommand());
         getCommand("reset").setExecutor(new ResetCommand());
         getCommand("fp").setExecutor(new LevelsDebugCommand());
+        getCommand("enderchest").setExecutor(new EnderchestCommand());
+        getCommand("truenick").setExecutor(new TrueNickCommand());
 
         getServer().getPluginManager().registerEvents(new SpawnListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
