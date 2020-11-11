@@ -11,8 +11,8 @@ import pl.trollcraft.pvp.scoreboard.ScoreboardHandler;
 
 public class DeathEvent extends Event {
 
-    private Player victim;
-    private Player killer;
+    private final Player victim;
+    private final Player killer;
 
     public DeathEvent (Player victim, Player killer) {
         this.victim = victim;

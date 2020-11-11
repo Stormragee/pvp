@@ -4,3 +4,6 @@ antylogout:
     - Bajka
     - Wulkan
     - Wioska
+  commands:
+    accept:
+      - 'huj'

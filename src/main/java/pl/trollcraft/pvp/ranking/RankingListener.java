@@ -16,9 +16,11 @@ public class RankingListener implements Listener {
 
         int killsPos = PVP.getPlugin().getKillsRanking().load(player);
         int ecoPos = PVP.getPlugin().getEconomyRanking().load(player);
+        int killStreakPos = PVP.getPlugin().getKillStreakRanking().load(player);
 
         ChatUtils.sendMessage(player, ChatUtils.fixColor("&aTwoj pozycja w rankingu zabojcow to &e&l" + killsPos + " miejsce."));
         ChatUtils.sendMessage(player, ChatUtils.fixColor("&aTwoj pozycja w rankingu bogaczy to &e&l" + ecoPos + " miejsce."));
+        ChatUtils.sendMessage(player, ChatUtils.fixColor("&aTwoj pozycja w rankingu serii zabojstw to &e&l" + killStreakPos + " miejsce."));
     }
 
     @EventHandler

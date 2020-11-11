@@ -18,7 +18,7 @@ public class ChatManager implements Listener {
     @EventHandler
     public void onChat (AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        String message = ChatProcessor.deflood(event.getMessage());
+        String message = event.getMessage();
 
         ChatProcessor.Response res = ChatProcessor.process(player, message);
         if (res != ChatProcessor.Response.OK){

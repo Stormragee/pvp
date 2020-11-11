@@ -45,11 +45,10 @@ public class PortalsManager {
     }
 
     public static Portal getPortal(Location loc) {
-        for (Portal p : portals) {
-            if (p.getA() == null || p.getB() == null) continue;
-            if (p.isInPortal(loc)) return p;
-        }
-        return null;
+        return portals.stream()
+                .filter(p -> p.isInPortal(loc))
+                .findFirst()
+                .orElse(null);
     }
 
     public static Portal getPortal(String name) {

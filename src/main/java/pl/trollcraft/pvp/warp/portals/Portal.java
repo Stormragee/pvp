@@ -19,6 +19,9 @@ public class Portal {
     }
 
     public boolean isInPortal(Location location) {
+        if (!location.getWorld().getName().equals(a.getWorld().getName()))
+            return false;
+
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();

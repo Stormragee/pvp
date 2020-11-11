@@ -1,5 +1,6 @@
 package pl.trollcraft.pvp.antylogout;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -81,6 +82,10 @@ public class AntyLogout {
      */
     public boolean logout(Player player) {
         if (!combats.containsKey(player))
+            return false;
+
+        World world = player.getWorld();
+        if (!AntyLogoutData.shouldCheck(world))
             return false;
 
         long now = System.currentTimeMillis();

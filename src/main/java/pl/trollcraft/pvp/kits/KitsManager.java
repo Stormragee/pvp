@@ -11,6 +11,7 @@ public class KitsManager {
     private static Kit playerDefault;
     private static Kit vipDefault;
     private static Kit svipDefault;
+    private static Kit hunterDefault;
 
     private static ArrayList<Kit> kits = new ArrayList<>();
 
@@ -42,6 +43,7 @@ public class KitsManager {
     public static void load() {
 
         YamlConfiguration conf = Configs.load("kits.yml");
+        assert conf != null;
 
         conf.getConfigurationSection("kits").getKeys(false).forEach(name -> {
 
@@ -62,11 +64,13 @@ public class KitsManager {
         playerDefault = getKit(conf.getString("default.player"));
         vipDefault = getKit(conf.getString("default.vip"));
         svipDefault = getKit(conf.getString("default.svip"));
+        hunterDefault = getKit(conf.getString("default.hunter"));
     }
 
     public static Kit getPlayerDefault() { return playerDefault; }
     public static Kit getVipDefault() { return vipDefault; }
     public static Kit getSvipDefault() { return svipDefault; }
+    public static Kit getHunterDefault() { return hunterDefault; }
 
     public static Kit getKit(String name) {
         for (Kit kit : kits)

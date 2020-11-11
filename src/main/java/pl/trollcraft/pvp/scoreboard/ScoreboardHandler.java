@@ -12,6 +12,8 @@ import pl.trollcraft.pvp.help.Help;
 import pl.trollcraft.pvp.ranking.Ranking;
 import pl.trollcraft.pvp.ranking.RankingManager;
 
+import java.util.logging.Level;
+
 public class ScoreboardHandler {
 
     public static void setScoreboard(Player player) {
@@ -92,7 +94,10 @@ public class ScoreboardHandler {
 
     public static void update(Player player) {
         Warrior warrior = WarriorsManager.get(player);
-        assert warrior != null;
+        if (warrior == null) {
+            Bukkit.getLogger().log(Level.INFO, player.getName() + " warrior is null!");
+            return;
+        }
 
         Scoreboard board = player.getScoreboard();
 

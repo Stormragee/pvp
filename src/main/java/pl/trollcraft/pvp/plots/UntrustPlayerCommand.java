@@ -26,7 +26,7 @@ public class UntrustPlayerCommand implements CommandExecutor {
             player.performCommand(String.format("p untrust %s", args[0]));
 
         else
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/zaufaj <gracz>"));
+            ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/nieufaj <gracz>"));
 
 
 

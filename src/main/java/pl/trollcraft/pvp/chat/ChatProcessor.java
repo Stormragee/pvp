@@ -35,8 +35,6 @@ public class ChatProcessor {
 
     // -------- -------- -------- --------
 
-    public static String deflood(String message) { return message.replaceAll("(...+?)\\1+", "$1"); }
-
     public static Response process(Player player, String message) {
         ChatProfile chatProfile = ChatProfile.get(player);
         Warrior warrior = WarriorsManager.get(player);

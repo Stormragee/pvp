@@ -1,6 +1,8 @@
 package pl.trollcraft.pvp.antylogout;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,22 +13,41 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import pl.trollcraft.pvp.PVP;
-import pl.trollcraft.pvp.data.Warrior;
 import pl.trollcraft.pvp.data.WarriorsManager;
+import pl.trollcraft.pvp.death.DeathEvent;
 import pl.trollcraft.pvp.help.Help;
+import pl.trollcraft.pvp.help.dropping.Drop;
+
+import java.util.Objects;
 
 public class AntyLogoutListener implements Listener {
 
     private AntyLogout antyLogout = AntyLogout.getInstance();
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onDamage (EntityDamageByEntityEvent event) {
 
-        if (!(event.getDamager().getType() == EntityType.PLAYER && event.getEntity().getType() == EntityType.PLAYER))
+        Entity victim = event.getEntity();
+        Entity damager = event.getDamager();
+        handleDamage(victim, damager);
+    }
+
+    private void handleDamage(Entity victimEntity, Entity damagerEntity) {
+
+        if (victimEntity.getType() != EntityType.PLAYER)
             return;
 
-        Player entity = (Player) event.getEntity();
-        Player damager = (Player) event.getDamager();
+        Player entity = (Player) victimEntity;
+        Player damager;
+
+        if (damagerEntity.getType() == EntityType.PLAYER)
+            damager = (Player) damagerEntity;
+
+        else if (damagerEntity.getType() == EntityType.ARROW)
+            damager = (Player) ((Arrow) damagerEntity).getShooter();
+
+        else
+            return;
 
         if (!AntyLogoutData.shouldCheck(damager.getWorld()))
             return;
@@ -36,7 +57,6 @@ public class AntyLogoutListener implements Listener {
 
         if (antyLogout.inCombat(damager) == AntyLogout.Response.ADDED)
             damager.sendMessage(Help.color("&7UWAGA! Jestes teraz &ew walce. Nie wylogowywuj sie!"));
-
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
@@ -45,9 +65,9 @@ public class AntyLogoutListener implements Listener {
         Player player = event.getPlayer();
         if (antyLogout.logout(player)) {
             Bukkit.getOnlinePlayers().forEach( p -> p.sendMessage(Help.color("&7Gracz " + player.getName() + " wylogowal sie podczas walki!")) );
-            player.getInventory().clear();
+            Drop.drop(player);
 
-            WarriorsManager.get(player).addDeath();
+            Objects.requireNonNull(WarriorsManager.get(player)).addDeath();
         }
 
     }
@@ -56,9 +76,22 @@ public class AntyLogoutListener implements Listener {
     public void onCommand (PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         if (AntyLogout.getInstance().logout(player)) {
+
+            if (AntyLogoutData.commandAccepted(event.getMessage()))
+                return;
+
             event.setCancelled(true);
             player.sendMessage(Help.color("&cPodczas walki nie mozesz uzywac komend."));
         }
+    }
+
+    @EventHandler
+    public void onDeath (DeathEvent event) {
+
+        Player victim = event.getVictim();
+
+        if (AntyLogout.getInstance().outCombat(victim) == AntyLogout.Response.REMOVED)
+            victim.sendMessage(Help.color("&aNie jestes juz w walce - &emozesz sie wylogowac."));
 
     }
 

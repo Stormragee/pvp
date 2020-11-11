@@ -91,8 +91,12 @@ public class RankingCommand implements CommandExecutor {
             }
 
             itemStack.setItemMeta(meta);
+            player.sendMessage((9/size+1 + i*size + 9) + "");
 
-            gui.addItem(9/size-1 + i + 9 + zero(i), itemStack, e -> e.setCancelled(true));
+            if (size % 2 == 0)
+                gui.addItem(9/size-1 + i + 9 + zero(i), itemStack, e -> e.setCancelled(true));
+            else
+                gui.addItem(9/size+1 + i*size + 9 - 3, itemStack, e -> e.setCancelled(true));
 
         }
 

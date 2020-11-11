@@ -22,7 +22,9 @@ public class SpawnCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
+        assert SpawnListener.SPAWN != null;
         new DelayedWarp(player, TimeUnit.SECONDS.toMillis(5), SpawnListener.SPAWN.getLocation());
+
         ChatUtils.sendMessage(player, ChatUtils.fixColor("&7Teleportacja nastapi za &e5 sekund. &7Nie ruszaj sie."));
 
         return true;

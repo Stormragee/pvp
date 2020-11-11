@@ -29,6 +29,7 @@ public class WarriorsManager {
                 conf.set("warriors." + name + ".kills", warrior.getKills());
                 conf.set("warriors." + name + ".killStreak", warrior.getKillStreak());
                 conf.set("warriors." + name + ".deaths", warrior.getDeaths());
+                conf.set("warriors." + name + ".highestKillStreak", warrior.getHighestKillStreak());
                 Configs.save(conf, "warriors.yml");
             }
 
@@ -45,6 +46,7 @@ public class WarriorsManager {
             conf.set("warriors." + name + ".kills", warrior.getKills());
             conf.set("warriors." + name + ".killStreak", warrior.getKillStreak());
             conf.set("warriors." + name + ".deaths", warrior.getDeaths());
+            conf.set("warriors." + name + ".highestKillStreak", warrior.getHighestKillStreak());
         }
         Configs.save(conf, "warriors.yml");
     }
@@ -58,7 +60,12 @@ public class WarriorsManager {
                 YamlConfiguration conf = Configs.load("warriors.yml");
                 String name = player.getName();
 
-                if (!conf.contains("warriors." + name)) register(new Warrior(player, 1, 0, 0, 0));
+                assert conf != null;
+                if (!conf.contains("warriors." + name)) {
+                    Warrior warrior = new Warrior(player, 1, 0, 0, 0, 0);
+                    register(warrior);
+                    Bukkit.getPluginManager().callEvent(new AsyncWarriorLoadEvent(warrior));
+                }
                 else {
 
                     int level = conf.getInt("warriors." + name + ".level");
@@ -70,7 +77,13 @@ public class WarriorsManager {
 
                     int deaths = conf.getInt("warriors." + name + ".deaths");
 
-                    Warrior warrior = new Warrior(player, level, kills, killStreak, deaths);
+                    int highestKillStreak;
+                    if (conf.contains("warriors." + name + ".highestKillStreak"))
+                        highestKillStreak = conf.getInt("warriors." + name + ".highestKillStreak");
+                    else
+                        highestKillStreak = 0;
+
+                    Warrior warrior = new Warrior(player, level, kills, killStreak, deaths, highestKillStreak);
                     register(warrior);
 
                     Bukkit.getPluginManager().callEvent(new AsyncWarriorLoadEvent(warrior));

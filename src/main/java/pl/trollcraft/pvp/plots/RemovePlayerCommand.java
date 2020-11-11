@@ -22,7 +22,7 @@ public class RemovePlayerCommand implements CommandExecutor {
             player.performCommand(String.format("p remove %s", args[0]));
 
         else
-            ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/zaufaj <gracz>"));
+            ChatUtils.sendMessage(player, ChatUtils.fixColor("&eUzycie: &7/usun <gracz>"));
 
         return true;
     }

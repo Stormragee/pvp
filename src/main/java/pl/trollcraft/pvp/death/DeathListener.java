@@ -18,6 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import pl.trollcraft.pvp.PVP;
 import pl.trollcraft.pvp.help.ChatUtils;
+import pl.trollcraft.pvp.help.Help;
+import pl.trollcraft.pvp.help.dropping.Drop;
 import pl.trollcraft.pvp.kits.KitsManager;
 import pl.trollcraft.pvp.scoreboard.ScoreboardHandler;
 
@@ -111,24 +113,10 @@ public class DeathListener implements Listener {
         KillsManager.clear(player);
     }
 
-    private boolean death(Player player, double finalDamage) {
+    public static boolean death(Player player, double finalDamage) {
         if (player.getHealth() - finalDamage <= 0) {
 
-            ScoreboardHandler.update(player);
-
-            player.closeInventory();
-            player.setHealth(player.getMaxHealth());
-            player.setFoodLevel(20);
-            drop(player);
-            player.setFireTicks(1);
-            player.setExp(0);
-            player.setLevel(0);
-
-            for(PotionEffect effect:player.getActivePotionEffects())
-                player.removePotionEffect(effect.getType());
-
-            player.teleport(player.getLocation().getWorld().getSpawnLocation());
-            giveKit(player);
+            kill(player);
 
             return true;
 
@@ -136,28 +124,28 @@ public class DeathListener implements Listener {
         else return false;
     }
 
-    private void drop(Player player) {
-        World world = player.getWorld();
-        Location loc = player.getLocation();
+    public static void kill(Player player) {
+        ScoreboardHandler.update(player);
 
-        for (ItemStack itemStack : player.getInventory()) {
-            if (itemStack == null || itemStack.getType() == Material.AIR) continue;
-            if (itemStack.getType().name().contains("IRON")) continue;
-            if (itemStack.getType() == Material.ARROW) continue;
-            world.dropItem(loc, itemStack);
-        }
+        player.closeInventory();
+        player.setHealth(player.getMaxHealth());
+        player.setFoodLevel(20);
+        Drop.drop(player);
+        player.setFireTicks(1);
+        player.setExp(0);
+        player.setLevel(0);
 
-        for (ItemStack itemStack : player.getInventory().getArmorContents()) {
-            if (itemStack == null || itemStack.getType() == Material.AIR) continue;
-            if (itemStack.getType().name().contains("IRON")) continue;
-            world.dropItem(loc, itemStack);
-        }
+        for(PotionEffect effect:player.getActivePotionEffects())
+            player.removePotionEffect(effect.getType());
 
-        player.getInventory().clear();
+        player.teleport(player.getLocation().getWorld().getSpawnLocation());
+        giveKit(player);
     }
 
-    private void giveKit(Player player) {
-        if (player.hasPermission("pvp.svip"))
+    private static void giveKit(Player player) {
+        if (player.hasPermission("pvp.hunter"))
+            KitsManager.getHunterDefault().give(player, true);
+        else if (player.hasPermission("pvp.svip"))
             KitsManager.getSvipDefault().give(player, true);
         else if (player.hasPermission("pvp.vip"))
             KitsManager.getVipDefault().give(player, true);

@@ -6,11 +6,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import pl.trollcraft.pvp.PVP;
 import pl.trollcraft.pvp.boosters.Booster;
+import pl.trollcraft.pvp.data.events.NewHighestKillStreakEvent;
 import pl.trollcraft.pvp.death.DeathEvent;
 import pl.trollcraft.pvp.death.KillsManager;
 import pl.trollcraft.pvp.economy.EconomyManager;
 import pl.trollcraft.pvp.help.ChatUtils;
+import pl.trollcraft.pvp.help.Help;
 
 public class WarriorsListener implements Listener {
 
@@ -42,6 +45,7 @@ public class WarriorsListener implements Listener {
 
             if (killer == null){
                 Warrior victimWarrior = WarriorsManager.get(victim);
+                assert victimWarrior != null;
                 victimWarrior.addDeath();
                 return;
             }
@@ -55,11 +59,15 @@ public class WarriorsListener implements Listener {
 
         if (killer.getAddress().getHostString().equals(victim.getAddress().getHostString())) return;
 
+        assert killerWarrior != null;
+        assert victimWarrior != null;
+
         killerWarrior.addKill();
         victimWarrior.addDeath();
 
         double rew = 10d;
-        if (killer.hasPermission("pvp.svip")) rew = 20d;
+        if (killer.hasPermission("pvp.hunter")) rew = 25d;
+        else if (killer.hasPermission("pvp.svip")) rew = 20d;
         else if (killer.hasPermission("pvp.vip")) rew = 15d;
 
         double bonus = Booster.getBonus(killer);
@@ -75,6 +83,17 @@ public class WarriorsListener implements Listener {
 
         if (killerWarrior.tryPromote())
             killer.sendTitle(ChatUtils.fixColor("&a&lAwans!"), ChatUtils.fixColor("&aWitaj na &epoziomie " + killerWarrior.getLevel()));
+    }
+
+    @EventHandler
+    public void onNewKillStreak (NewHighestKillStreakEvent event) {
+
+        Warrior warrior = event.getWarrior();
+        Player player = warrior.getPlayer();
+
+        player.sendMessage(Help.color("&aNowa najlepsza seria zabojstw! &e&l" + event.getNewHighestKillStreak() + "!"));
+        PVP.getPlugin().getKillStreakRanking().promoteSwap(player);
+
     }
 
 }

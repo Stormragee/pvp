@@ -27,6 +27,7 @@ import pl.trollcraft.pvp.data.levels.LevelsManager;
 import pl.trollcraft.pvp.data.rewards.RewardsListener;
 import pl.trollcraft.pvp.data.rewards.RewardsManager;
 import pl.trollcraft.pvp.death.KillsManager;
+import pl.trollcraft.pvp.death.VoidListener;
 import pl.trollcraft.pvp.economy.EconomyManager;
 import pl.trollcraft.pvp.essentials.EnderchestCommand;
 import pl.trollcraft.pvp.help.*;
@@ -35,8 +36,8 @@ import pl.trollcraft.pvp.economy.EconomyListener;
 import pl.trollcraft.pvp.economy.commands.EconomyCommand;
 import pl.trollcraft.pvp.economy.commands.MoneyCommand;
 import pl.trollcraft.pvp.economy.commands.PayCommand;
+import pl.trollcraft.pvp.help.dropping.Drop;
 import pl.trollcraft.pvp.help.flying.FlyCommand;
-import pl.trollcraft.pvp.help.flying.FlyingListener;
 import pl.trollcraft.pvp.help.gui.InventoryListener;
 import pl.trollcraft.pvp.help.move.MoveDetect;
 import pl.trollcraft.pvp.help.tasks.OfflineTask;
@@ -59,10 +60,15 @@ import pl.trollcraft.pvp.ranking.holoranking.HoloRankingListener;
 import pl.trollcraft.pvp.ranking.holoranking.HoloRankingsCommand;
 import pl.trollcraft.pvp.ranking.holoranking.HoloRankingsManager;
 import pl.trollcraft.pvp.ranking.kills.KillsRanking;
+import pl.trollcraft.pvp.ranking.killstreak.KillStreakRanking;
 import pl.trollcraft.pvp.scoreboard.ScoreboardListener;
 import pl.trollcraft.pvp.signshop.SignShopCommand;
 import pl.trollcraft.pvp.signshop.SignShopsListener;
 import pl.trollcraft.pvp.signshop.SignShopsManager;
+import pl.trollcraft.pvp.uniqueitems.EnchantRegister;
+import pl.trollcraft.pvp.uniqueitems.UniqueItemsCommand;
+import pl.trollcraft.pvp.uniqueitems.UniqueItemsController;
+import pl.trollcraft.pvp.uniqueitems.UniqueItemsListener;
 import pl.trollcraft.pvp.warehouses.WarehousesListener;
 import pl.trollcraft.pvp.warp.*;
 import pl.trollcraft.pvp.warp.commands.DelWarpCommand;
@@ -81,12 +87,16 @@ public class PVP extends JavaPlugin {
 
     private KillsRanking killsRanking;
     private EconomyRanking economyRanking;
+    private KillStreakRanking killStreakRanking;
 
     @Override
     public void onEnable() {
         plugin = this;
 
         getLogger().log(Level.INFO, "PVP is enabling, it may take up to few minutes.");
+
+        getLogger().log(Level.INFO, "Registering enchants...");
+        EnchantRegister.register();
 
         getLogger().log(Level.INFO, "Loading config...");
         ConfigData.load();
@@ -140,17 +150,27 @@ public class PVP extends JavaPlugin {
         getLogger().log(Level.INFO, "Loading incognito nicknames...");
         IncognitoData.load();
 
+        getLogger().log(Level.INFO, "Loading unique items...");
+        UniqueItemsController.load();
+
         getLogger().log(Level.INFO, "PVP base loaded. Loading extras.");
+
+        Drop.init();
 
         AntyLogout.newInstance(1000 * 15);
         killsRanking = new KillsRanking();
         economyRanking = new EconomyRanking();
+        killStreakRanking = new KillStreakRanking();
+
         RankingManager.register(killsRanking);
         RankingManager.register(economyRanking);
+        RankingManager.register(killStreakRanking);
+
         HoloRankingsManager.load();
-        FlyingListener.listen();
 
         new PlaceholderManager().register();
+
+        VoidListener.listen();
 
         getCommand("kit").setExecutor(new KitCommand());
         getCommand("kitadmin").setExecutor(new KitAdminCommand());
@@ -170,18 +190,21 @@ public class PVP extends JavaPlugin {
         getCommand("ranking").setExecutor(new pl.trollcraft.pvp.ranking.commands.RankingCommand());
 
         getCommand("holoranking").setExecutor(new HoloRankingsCommand());
-        getCommand("plot").setExecutor(new PlotCommand());
         getCommand("message").setExecutor(new MessageCommand());
         getCommand("respond").setExecutor(new ResponseCommand());
         getCommand("broadcast").setExecutor(new BroadcastCommand());
         getCommand("chat").setExecutor(new ChatCommand());
         getCommand("spawn").setExecutor(new SpawnCommand());
+
+        getCommand("dzialki").setExecutor(new PlotsCommand());
+        getCommand("plot").setExecutor(new PlotCommand());
         getCommand("dodaj").setExecutor(new AddToPlotCommand());
         getCommand("zaufaj").setExecutor(new AddTrustedCommand());
         getCommand("usun").setExecutor(new RemovePlayerCommand());
         getCommand("nieufaj").setExecutor(new UntrustPlayerCommand());
-        getCommand("repair").setExecutor(new RepairCommand());
         getCommand("dinfo").setExecutor(new PlotInfoCommand());
+
+        getCommand("repair").setExecutor(new RepairCommand());
         getCommand("booster").setExecutor(new BoosterCommand());
         getCommand("boosteradmin").setExecutor(new BoosterAdminCommand());
         getCommand("cmd").setExecutor(new CmdsCommand());
@@ -192,6 +215,8 @@ public class PVP extends JavaPlugin {
         getCommand("fp").setExecutor(new LevelsDebugCommand());
         getCommand("enderchest").setExecutor(new EnderchestCommand());
         getCommand("truenick").setExecutor(new TrueNickCommand());
+
+        getCommand("uniqueitems").setExecutor(new UniqueItemsCommand());
 
         getServer().getPluginManager().registerEvents(new SpawnListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
@@ -213,6 +238,7 @@ public class PVP extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new OfflineTaskListener(), this);
         getServer().getPluginManager().registerEvents(new AuctionViewListener(), this);
         getServer().getPluginManager().registerEvents(new RewardsListener(), this);
+        getServer().getPluginManager().registerEvents(new UniqueItemsListener(), this);
 
         AntyLogoutListener antyLogoutListener = new AntyLogoutListener();
         antyLogoutListener.listen();
@@ -230,6 +256,7 @@ public class PVP extends JavaPlugin {
 
     public KillsRanking getKillsRanking() { return killsRanking; }
     public EconomyRanking getEconomyRanking() { return economyRanking; }
+    public KillStreakRanking getKillStreakRanking() { return killStreakRanking; }
 
     public static PVP getPlugin() { return plugin; }
 

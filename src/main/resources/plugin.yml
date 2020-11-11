@@ -102,3 +102,8 @@ commands:
     aliases: [ec]
   truenick:
     description: Shows all nicknames in incognito mode.
+  uniqueitems:
+    description: Unique Items manager.
+    aliases: [ui]
+  dzialki:
+    description: Teleports to plotworld.

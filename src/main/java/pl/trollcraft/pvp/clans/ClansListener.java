@@ -1,6 +1,6 @@
 package pl.trollcraft.pvp.clans;
 
-import com.nametagedit.plugin.NametagEdit;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import pl.trollcraft.pvp.clans.event.ClanMembersDamagePreventEvent;
 import pl.trollcraft.pvp.death.DeathEvent;
 
 public class ClansListener implements Listener {
@@ -18,10 +19,6 @@ public class ClansListener implements Listener {
     public void onJoin (PlayerJoinEvent event) {
         Player player = event.getPlayer();
         ClansManager.load(player);
-
-        Clan clan = ClansManager.get(player);
-        if (clan != null)
-            NametagEdit.getApi().setPrefix(player, "&e[" + clan.getName() + "] &f");
     }
 
     @EventHandler
@@ -44,7 +41,19 @@ public class ClansListener implements Listener {
             damager = (Player) ((Arrow) event.getDamager()).getShooter();
 
         if (victim.getEntityId() == damager.getEntityId()) return;
-        if (ClansManager.belongToClan(victim, damager)) event.setCancelled(true);
+        if (ClansManager.belongToClan(victim, damager)) {
+
+            Clan clan = ClansManager.get(victim);
+
+            ClanMembersDamagePreventEvent e = new ClanMembersDamagePreventEvent(clan, damager, victim);
+            Bukkit.getPluginManager().callEvent(e);
+
+            if (e.isCancelled())
+                return;
+
+            event.setCancelled(true);
+
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
