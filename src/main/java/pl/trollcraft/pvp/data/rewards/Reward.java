@@ -26,13 +26,25 @@ public class Reward {
     }
 
     /**
+     * Gets the type of the reward.
+     *
+     * @return type of the reward.
+     */
+    public RewardType getType() {
+        return type;
+    }
+
+    /**
      * Takes care of rewarding process.
      *
      * @param player player to reward.
      */
-    public void reward(Player player) {
-        type.reward(player);
-        type.message(player);
+    public boolean reward(Player player) {
+        if (type.reward(player)) {
+            type.message(player);
+            return true;
+        }
+        return false;
     }
 
 }

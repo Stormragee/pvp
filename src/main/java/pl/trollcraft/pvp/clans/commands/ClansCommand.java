@@ -15,6 +15,8 @@ import pl.trollcraft.pvp.economy.EconomyProfile;
 import pl.trollcraft.pvp.help.ChatUtils;
 import pl.trollcraft.pvp.help.Help;
 
+import java.util.Collection;
+
 public class ClansCommand implements CommandExecutor {
 
     @Override
@@ -106,7 +108,7 @@ public class ClansCommand implements CommandExecutor {
                     return true;
                 }
 
-                if (clan.getMembers() >= ClansManager.getClanMaxPlayers()){
+                if (clan.getMembers() >= clan.getMaxMembers()){
                     ChatUtils.sendMessage(player, ChatUtils.fixColor("&cKlan osiagnal max. liczbe graczy."));
                     return true;
                 }
@@ -138,7 +140,9 @@ public class ClansCommand implements CommandExecutor {
             if (owner){
                 player.sendMessage(ChatUtils.fixColor("&7Jestes wlascicielem klanu &e" + clan.getName() + ":"));
                 player.sendMessage("");
-                player.sendMessage(ChatUtils.fixColor("  &7Czlonkow: &e&l" + (clan.getPlayers().size() + 1) + "/5"));
+                player.sendMessage(Help.color("  &7Poziom klanu: &e&l" + Help.toRoman(clan.getLevel())));
+                player.sendMessage("");
+                player.sendMessage(ChatUtils.fixColor("  &7Czlonkow: &e&l" + (clan.getPlayers().size() + 1) + "/" + clan.getMaxMembers()));
                 player.sendMessage(ChatUtils.fixColor("  &7Zabojstw: &e&l" + clan.getKills()));
                 player.sendMessage(ChatUtils.fixColor("  &7Smierci: &e&l" + clan.getDeaths()));
                 player.sendMessage("");
@@ -148,11 +152,17 @@ public class ClansCommand implements CommandExecutor {
                 player.sendMessage(ChatUtils.fixColor("  &e/klan wyrzuc <gracz>"));
                 player.sendMessage(ChatUtils.fixColor("  &e/klan msg <wiadomosc>"));
                 player.sendMessage(ChatUtils.fixColor("  &e/klan oddaj <nowy wlasciciel>"));
+                player.sendMessage("");
+                player.sendMessage(ChatUtils.fixColor("  &e/klan wojna <klan>"));
+                player.sendMessage(ChatUtils.fixColor("  &e/klan pokoj <klan>"));
+                player.sendMessage("");
                 player.sendMessage(ChatUtils.fixColor("  &e/klan rozwiaz"));
                 player.sendMessage("");
             }
             else {
                 player.sendMessage(ChatUtils.fixColor("&7Nalezysz do klanu &e" + clan.getName() + ":"));
+                player.sendMessage("");
+                player.sendMessage(Help.color("  &7Poziom klanu: &e&l" + Help.toRoman(clan.getLevel())));
                 player.sendMessage("");
                 player.sendMessage(ChatUtils.fixColor("  &7Czlonkow: &e&l" + (clan.getPlayers().size() + 1) + "/5"));
                 player.sendMessage(ChatUtils.fixColor("  &7Zabojstw: &e&l" + clan.getKills()));
@@ -245,6 +255,67 @@ public class ClansCommand implements CommandExecutor {
                     clan.announce("&cWlasiciel rozwiazuje gang...", true);
                     ClansManager.remove(clan);
                     return true;
+                }
+
+                else if (args[0].equalsIgnoreCase("wojna")) {
+
+                   if (args.length != 2) {
+
+                       if (!clan.getWar().isEmpty()){
+                           player.sendMessage(Help.color("&7Prowadzone wojny:"));
+                           clan.getWar()
+                                   .stream()
+                                   .map(ClansManager::get)
+                                   .forEach(c -> player.sendMessage(Help.color("  &e - " + c.getName())));
+                       }
+                       else
+                           player.sendMessage(Help.color("&eBrak wojen."));
+
+                       player.sendMessage("");
+                       player.sendMessage(Help.color("&7Aby wypowiedziec wojne uzyj: &e/klan wojna <klan>"));
+                       return true;
+                   }
+
+                   Clan war = ClansManager.get(args[1]);
+
+                   if (war == null) {
+                       player.sendMessage(Help.color("&cNieznany klan."));
+                       return true;
+                   }
+
+                   if (clan.declareWar(war) && war.declareWar(clan)) {
+                       clan.announce("&cUwaga! Wybucha wojna z klanem &e" + war.getName() + "!", true);
+                       war.announce("&cUwaga! Wybucha wojna z klanem &e" + clan.getName() + "!", true);
+                   }
+                   else
+                       player.sendMessage(Help.color("&cNie mozna wypowiedziec wojny temu klanowi."));
+
+                }
+
+                else if (args[0].equalsIgnoreCase("pokoj")) {
+
+                    if (args.length != 2) {
+                        player.sendMessage(Help.color("&eUzycie: &e/klan pokoj <klan>"));
+                        return true;
+                    }
+
+                    Clan peace = ClansManager.get(args[1]);
+
+                    if (peace == null) {
+                        player.sendMessage(Help.color("&cNieznany klan."));
+                        return true;
+                    }
+
+                    if (ClansManager.peace(clan, peace)) {
+                        clan.announce("&aZawarto pokoj z klanem &e" + peace.getName() + "!", true);
+                        peace.announce("&aZawarto pokoj z klanem &e" + clan.getName() + "!", true);
+                    }
+                    else {
+                        clan.announce("&aWyslano prosbe o rozejm do klanu &e" + peace.getName() + "!", true);
+                        peace.announce("&aProsba o rozejm od klanu &e" + clan.getName() + "!\n" +
+                                "&aAby przyjac: &e/klan pokoj " + clan.getName(), true);
+                    }
+
                 }
 
             }

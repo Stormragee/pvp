@@ -20,15 +20,15 @@ public class EconomyProfile {
 
     public void give(double money) {
         this.money += money;
-        ((EconomyPosition) PVP.getPlugin().getEconomyRanking().get(player)).setMoney(this.money);
-        PVP.getPlugin().getEconomyRanking().promoteSwap(player);
+        //((EconomyPosition) PVP.getPlugin().getEconomyRanking().get(player)).setMoney(this.money);
+        //PVP.getPlugin().getEconomyRanking().promoteSwap(player);
     }
 
     public boolean take(double money) {
         if (has(money)) {
             this.money -= money;
-            ((EconomyPosition) PVP.getPlugin().getEconomyRanking().get(player)).setMoney(this.money);
-            PVP.getPlugin().getEconomyRanking().demoteSwap(player);
+            //((EconomyPosition) PVP.getPlugin().getEconomyRanking().get(player)).setMoney(this.money);
+            //PVP.getPlugin().getEconomyRanking().demoteSwap(player);
             return true;
         }
         return false;

@@ -2,8 +2,8 @@ package pl.trollcraft.pvp.help.dropping.rules;
 
 import org.bukkit.inventory.ItemStack;
 
-public interface DropRule {
+public interface PreventDrop {
 
-    boolean check(ItemStack itemStack);
+    boolean prevent(ItemStack itemStack);
 
 }

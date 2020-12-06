@@ -1,5 +1,6 @@
 package pl.trollcraft.pvp.data;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -12,8 +13,11 @@ import pl.trollcraft.pvp.data.events.NewHighestKillStreakEvent;
 import pl.trollcraft.pvp.death.DeathEvent;
 import pl.trollcraft.pvp.death.KillsManager;
 import pl.trollcraft.pvp.economy.EconomyManager;
+import pl.trollcraft.pvp.economy.EconomyProfile;
 import pl.trollcraft.pvp.help.ChatUtils;
 import pl.trollcraft.pvp.help.Help;
+
+import java.util.logging.Level;
 
 public class WarriorsListener implements Listener {
 
@@ -72,9 +76,18 @@ public class WarriorsListener implements Listener {
 
         double bonus = Booster.getBonus(killer);
         if (bonus != 1) {
+
             double rewBonus = rew * bonus;
-            EconomyManager.get(killer).give(rewBonus);
-            killer.sendMessage(ChatUtils.fixColor("&a&l" + victim.getName() + " +" + rew + " * " + bonus + " = &e&l"  + rewBonus + " TC"));
+            EconomyProfile profile = EconomyManager.get(killer);
+
+            if (profile == null) {
+                Bukkit.getLogger().log(Level.INFO, "Killer economy profile is null: " + killer.getName());
+            }
+            else{
+                EconomyManager.get(killer).give(rewBonus);
+                killer.sendMessage(ChatUtils.fixColor("&a&l" + victim.getName() + " +" + rew + " * " + bonus + " = &e&l"  + rewBonus + " TC"));
+            }
+
         }
         else {
             EconomyManager.get(killer).give(rew);
@@ -92,7 +105,7 @@ public class WarriorsListener implements Listener {
         Player player = warrior.getPlayer();
 
         player.sendMessage(Help.color("&aNowa najlepsza seria zabojstw! &e&l" + event.getNewHighestKillStreak() + "!"));
-        PVP.getPlugin().getKillStreakRanking().promoteSwap(player);
+        //TODO PVP.getPlugin().getKillStreakRanking().promoteSwap(player);
 
     }
 

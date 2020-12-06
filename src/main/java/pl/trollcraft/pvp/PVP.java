@@ -26,9 +26,13 @@ import pl.trollcraft.pvp.data.levels.LevelsDebugCommand;
 import pl.trollcraft.pvp.data.levels.LevelsManager;
 import pl.trollcraft.pvp.data.rewards.RewardsListener;
 import pl.trollcraft.pvp.data.rewards.RewardsManager;
+import pl.trollcraft.pvp.data.rewards.user.RewardsUserCommand;
+import pl.trollcraft.pvp.data.rewards.user.RewardsUserListener;
+import pl.trollcraft.pvp.data.rewards.user.RewardsUsersManager;
 import pl.trollcraft.pvp.death.KillsManager;
 import pl.trollcraft.pvp.death.VoidListener;
 import pl.trollcraft.pvp.economy.EconomyManager;
+import pl.trollcraft.pvp.enchanting.EnchantingListener;
 import pl.trollcraft.pvp.essentials.EnderchestCommand;
 import pl.trollcraft.pvp.help.*;
 import pl.trollcraft.pvp.death.DeathListener;
@@ -52,19 +56,20 @@ import pl.trollcraft.pvp.kits.KitListener;
 import pl.trollcraft.pvp.kits.KitsManager;
 import pl.trollcraft.pvp.kits.commands.KitGiveCommand;
 import pl.trollcraft.pvp.plots.*;
-import pl.trollcraft.pvp.ranking.RankingCommand;
-import pl.trollcraft.pvp.ranking.RankingListener;
-import pl.trollcraft.pvp.ranking.RankingManager;
-import pl.trollcraft.pvp.ranking.economy.EconomyRanking;
-import pl.trollcraft.pvp.ranking.holoranking.HoloRankingListener;
-import pl.trollcraft.pvp.ranking.holoranking.HoloRankingsCommand;
-import pl.trollcraft.pvp.ranking.holoranking.HoloRankingsManager;
-import pl.trollcraft.pvp.ranking.kills.KillsRanking;
-import pl.trollcraft.pvp.ranking.killstreak.KillStreakRanking;
+import pl.trollcraft.pvp.ranking.commands.RankingCommand;
+import pl.trollcraft.pvp.rankings.RankingListener;
+import pl.trollcraft.pvp.rankings.holoranking.HoloRankingListener;
+import pl.trollcraft.pvp.rankings.holoranking.HoloRankingsCommand;
+import pl.trollcraft.pvp.rankings.RankingsManager;
+import pl.trollcraft.pvp.rankings.commands.RankingDebugCommand;
+import pl.trollcraft.pvp.rankings.holoranking.HoloRankingsManager;
+import pl.trollcraft.pvp.rankings.kills.KillsRanking;
 import pl.trollcraft.pvp.scoreboard.ScoreboardListener;
 import pl.trollcraft.pvp.signshop.SignShopCommand;
 import pl.trollcraft.pvp.signshop.SignShopsListener;
 import pl.trollcraft.pvp.signshop.SignShopsManager;
+import pl.trollcraft.pvp.teleport.RandomTeleportListener;
+import pl.trollcraft.pvp.teleport.random.RandomTeleportsManager;
 import pl.trollcraft.pvp.uniqueitems.EnchantRegister;
 import pl.trollcraft.pvp.uniqueitems.UniqueItemsCommand;
 import pl.trollcraft.pvp.uniqueitems.UniqueItemsController;
@@ -85,9 +90,11 @@ public class PVP extends JavaPlugin {
 
     private static PVP plugin;
 
-    private KillsRanking killsRanking;
-    private EconomyRanking economyRanking;
-    private KillStreakRanking killStreakRanking;
+    private RankingsManager rankingsManager;
+
+    private KillsRanking pointsRanking;
+
+    private RandomTeleportsManager randomTeleportsManager;
 
     @Override
     public void onEnable() {
@@ -157,16 +164,23 @@ public class PVP extends JavaPlugin {
 
         Drop.init();
 
-        AntyLogout.newInstance(1000 * 15);
-        killsRanking = new KillsRanking();
-        economyRanking = new EconomyRanking();
-        killStreakRanking = new KillStreakRanking();
+        // New ranking system
+        rankingsManager = new RankingsManager();
+        pointsRanking = new KillsRanking();
+        rankingsManager.register(pointsRanking);
+        HoloRankingsManager.load();
 
-        RankingManager.register(killsRanking);
+        AntyLogout.newInstance(1000 * 15);
+
+        /*RankingManager.register(killsRanking);
         RankingManager.register(economyRanking);
         RankingManager.register(killStreakRanking);
 
-        HoloRankingsManager.load();
+        HoloRankingsManager.load();*/
+
+        randomTeleportsManager = new RandomTeleportsManager();
+        randomTeleportsManager.load();
+        RandomTeleportListener.listen();
 
         new PlaceholderManager().register();
 
@@ -186,8 +200,7 @@ public class PVP extends JavaPlugin {
         getCommand("clan").setExecutor(new ClansCommand());
         getCommand("clanadmin").setExecutor(new ClansAdminCommand());
 
-        getCommand("rankingadm").setExecutor(new RankingCommand());
-        getCommand("ranking").setExecutor(new pl.trollcraft.pvp.ranking.commands.RankingCommand());
+        getCommand("ranking").setExecutor(new RankingCommand());
 
         getCommand("holoranking").setExecutor(new HoloRankingsCommand());
         getCommand("message").setExecutor(new MessageCommand());
@@ -217,6 +230,9 @@ public class PVP extends JavaPlugin {
         getCommand("truenick").setExecutor(new TrueNickCommand());
 
         getCommand("uniqueitems").setExecutor(new UniqueItemsCommand());
+        getCommand("rewards").setExecutor(new RewardsUserCommand());
+
+        getCommand("nranking").setExecutor(new RankingDebugCommand());
 
         getServer().getPluginManager().registerEvents(new SpawnListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
@@ -231,6 +247,7 @@ public class PVP extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EnderchestFixer(), this);
         getServer().getPluginManager().registerEvents(new MoveListener(), this);
         getServer().getPluginManager().registerEvents(new RankingListener(), this);
+
         getServer().getPluginManager().registerEvents(new HoloRankingListener(), this);
         getServer().getPluginManager().registerEvents(new ScoreboardListener(), this);
         getServer().getPluginManager().registerEvents(new CmdListener(), this);
@@ -239,9 +256,13 @@ public class PVP extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new AuctionViewListener(), this);
         getServer().getPluginManager().registerEvents(new RewardsListener(), this);
         getServer().getPluginManager().registerEvents(new UniqueItemsListener(), this);
+        getServer().getPluginManager().registerEvents(new RewardsUserListener(), this);
+        getServer().getPluginManager().registerEvents(new EnchantingListener(), this);
 
         AntyLogoutListener antyLogoutListener = new AntyLogoutListener();
         antyLogoutListener.listen();
+        antyLogoutListener.listenForMessage();
+
         getServer().getPluginManager().registerEvents(antyLogoutListener, this);
 
     }
@@ -252,11 +273,16 @@ public class PVP extends JavaPlugin {
         ClansManager.globalSave();
         WarriorsManager.globalSave();
         AuctionManager.save();
+        RewardsUsersManager.save();
     }
 
-    public KillsRanking getKillsRanking() { return killsRanking; }
-    public EconomyRanking getEconomyRanking() { return economyRanking; }
-    public KillStreakRanking getKillStreakRanking() { return killStreakRanking; }
+    public RankingsManager getRankingsManager() {
+        return rankingsManager;
+    }
+
+    public RandomTeleportsManager getRandomTeleportsManager() {
+        return randomTeleportsManager;
+    }
 
     public static PVP getPlugin() { return plugin; }
 

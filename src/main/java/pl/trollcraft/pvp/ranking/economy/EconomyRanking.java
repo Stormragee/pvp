@@ -33,6 +33,9 @@ public class EconomyRanking extends Ranking {
             position.setNext(positions.get(i-1));
         }
 
+        if (positions.isEmpty())
+            return;
+
         positions.get(0).setPrevious(positions.get(1));
         positions.get(positions.size()-1).setNext(positions.get(positions.size()-2));
     }

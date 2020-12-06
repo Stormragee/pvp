@@ -31,9 +31,11 @@ public class RewardsManager {
         assert conf != null;
 
         conf.getConfigurationSection("rewards").getKeys(false).forEach(lvlStr -> {
+
             int level = Integer.parseInt(lvlStr);
             String typeName = conf.getString("rewards." + lvlStr + ".type");
             RewardType type = RewardsLoader.load(typeName, conf,"rewards." + lvlStr + ".data");
+
             register(new Reward(level, type));
 
             Bukkit.getLogger().log(Level.INFO, "Loaded reward for level " + level);

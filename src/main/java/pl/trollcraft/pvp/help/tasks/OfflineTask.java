@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public abstract class OfflineTask {
 
-    private static ArrayList<OfflineTask> offlineTasks = new ArrayList<>();
+    private static final ArrayList<OfflineTask> offlineTasks = new ArrayList<>();
 
     private String id;
     private String playerName;
@@ -50,9 +50,13 @@ public abstract class OfflineTask {
         YamlConfiguration conf = Configs.load("tasks.yml");
         conf.set("tasks." + getId(), null);
         Configs.save(conf, "tasks.yml");
-        offlineTasks.remove(this);
     }
 
+    public static ArrayList<OfflineTask> getOfflineTasks() {
+        return offlineTasks;
+    }
+
+    @Deprecated
     public static List<OfflineTask> get(String playerName) {
         return offlineTasks.stream()
                 .filter( task -> task.playerName.equals(playerName) )
@@ -71,11 +75,7 @@ public abstract class OfflineTask {
                 OfflineTask task = (OfflineTask) taskClass.newInstance();
                 task.load(id);
 
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
 

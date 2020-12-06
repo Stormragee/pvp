@@ -72,8 +72,7 @@ commands:
     description: Zablokuj.
   odblokuj:
     description: Odblokuj
-  dzialki:
-    description: Dzialki.
+
   dinfo:
     description: Info.
   booster:
@@ -105,5 +104,13 @@ commands:
   uniqueitems:
     description: Unique Items manager.
     aliases: [ui]
+
   dzialki:
     description: Teleports to plotworld.
+
+  rewards:
+    description: Gives rewards for level up's.
+    aliases: [nagrody]
+
+  nranking:
+    description: N Ranking.

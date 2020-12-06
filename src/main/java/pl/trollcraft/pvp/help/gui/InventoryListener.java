@@ -12,13 +12,14 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onClick (InventoryClickEvent event) {
-
         if (event.getClickedInventory() == null) return;
-        if (!event.getClickedInventory().getName().contains("§"))
-            return;
 
         Player player = (Player) event.getWhoClicked();
         GUI gui = GUI.getOpened(player);
+
+        if (gui == null)
+            return;
+
         Consumer<InventoryClickEvent> click = gui.getClick(event.getSlot());
 
         if (click != null)
@@ -27,9 +28,6 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onClose (InventoryCloseEvent event) {
-        if (!event.getInventory().getName().contains("§"))
-            return;
-
         Player player = (Player) event.getPlayer();
         GUI gui = GUI.getOpened(player);
 

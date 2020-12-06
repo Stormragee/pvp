@@ -83,7 +83,6 @@ public abstract class Ranking {
 
         int pos = -1;
         while (position.getPrevious() != null && position.getPrevious().compareTo(position) == -1){
-            Bukkit.getConsoleSender().sendMessage(position.getName());
             swap(position, position.getPrevious());
             pos = positions.indexOf(position)+1;
         }
@@ -94,12 +93,20 @@ public abstract class Ranking {
     public void insertNew(Player player, Position position) {
         int size = positions.size();
         positions.add(position);
+
+        if (size == 0)
+            return;
+
         positions.get(size-2).setPrevious(positions.get(size-1));
         positions.get(size-1).setNext(positions.get(size-2));
+
         Bukkit.getServer().getPluginManager().callEvent(new RankingUpdateEvent(player, this));
     }
 
     public List<String> getPositions(int amount) {
+        if (this.positions.isEmpty())
+            return new ArrayList<>();
+
         ArrayList<String> positions = new ArrayList<>();
         Position p;
         for (int i = 0 ; i < amount ; i++) {

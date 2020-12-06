@@ -1,14 +1,17 @@
-package pl.trollcraft.pvp.ranking.holoranking;
+package pl.trollcraft.pvp.rankings.holoranking;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import pl.trollcraft.pvp.PVP;
 import pl.trollcraft.pvp.help.ChatUtils;
 import pl.trollcraft.pvp.help.GeneralUtils;
-import pl.trollcraft.pvp.ranking.Ranking;
-import pl.trollcraft.pvp.ranking.RankingManager;
+import pl.trollcraft.pvp.rankings.Ranking;
+import pl.trollcraft.pvp.rankings.RankingsManager;
+
+import java.util.Optional;
 
 public class HoloRankingsCommand implements CommandExecutor {
 
@@ -36,8 +39,8 @@ public class HoloRankingsCommand implements CommandExecutor {
                 return true;
             }
 
-            Ranking ranking = RankingManager.get(args[1]);
-            if (ranking == null) {
+            Optional<Ranking> rankingToBe = PVP.getPlugin().getRankingsManager().getRanking(args[1]);
+            if (!rankingToBe.isPresent()) {
                 ChatUtils.sendMessage(sender, ChatUtils.fixColor("&cBrak rankingu."));
                 return true;
             }
@@ -51,6 +54,7 @@ public class HoloRankingsCommand implements CommandExecutor {
             Player player = (Player) sender;
             Location location = player.getLocation();
 
+            Ranking ranking = rankingToBe.get();
             HoloRanking holoRanking = new HoloRanking(location, ranking, positions);
             HoloRankingsManager.register(holoRanking);
             HoloRankingsManager.save(holoRanking);

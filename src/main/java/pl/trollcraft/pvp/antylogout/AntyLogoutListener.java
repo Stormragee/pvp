@@ -13,10 +13,12 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import pl.trollcraft.pvp.PVP;
+import pl.trollcraft.pvp.antylogout.events.AntyLogoutEndEvent;
 import pl.trollcraft.pvp.data.WarriorsManager;
 import pl.trollcraft.pvp.death.DeathEvent;
 import pl.trollcraft.pvp.help.Help;
 import pl.trollcraft.pvp.help.dropping.Drop;
+import pl.trollcraft.pvp.help.packets.WrapperActionBar;
 
 import java.util.Objects;
 
@@ -30,6 +32,7 @@ public class AntyLogoutListener implements Listener {
         Entity victim = event.getEntity();
         Entity damager = event.getDamager();
         handleDamage(victim, damager);
+
     }
 
     private void handleDamage(Entity victimEntity, Entity damagerEntity) {
@@ -65,6 +68,7 @@ public class AntyLogoutListener implements Listener {
         Player player = event.getPlayer();
         if (antyLogout.logout(player)) {
             Bukkit.getOnlinePlayers().forEach( p -> p.sendMessage(Help.color("&7Gracz " + player.getName() + " wylogowal sie podczas walki!")) );
+
             Drop.drop(player);
 
             Objects.requireNonNull(WarriorsManager.get(player)).addDeath();
@@ -90,8 +94,55 @@ public class AntyLogoutListener implements Listener {
 
         Player victim = event.getVictim();
 
-        if (AntyLogout.getInstance().outCombat(victim) == AntyLogout.Response.REMOVED)
+        if (AntyLogout.getInstance().outCombat(victim) == AntyLogout.Response.REMOVED) {
             victim.sendMessage(Help.color("&aNie jestes juz w walce - &emozesz sie wylogowac."));
+            Bukkit.getPluginManager().callEvent(new AntyLogoutEndEvent(victim));
+        }
+
+    }
+
+    @EventHandler
+    public void onAntyLogoutStop (AntyLogoutEndEvent event) {
+        Player player = event.getPlayer();
+
+        WrapperActionBar a = new WrapperActionBar();
+        a.setText("&a&lMOZESZ SIE WYLOGOWAC!");
+
+        a.sendPacket(player);
+    }
+
+    public void listenForMessage() {
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+
+                AntyLogout
+                        .getInstance()
+                        .getCombats()
+                        .forEach( (player, time)  -> {
+
+                            long left = time - System.currentTimeMillis();
+
+                            long sec = (left / 1000) % 60;
+
+                            String s = "";
+                            if (sec < 10)
+                                s += "0";
+
+                            s += sec;
+
+                            WrapperActionBar a = new WrapperActionBar();
+                            a.setText("&c&l► &4&lJestes podczas walki jeszcze przez (&c&lx " + s + ")&4&l! &c&l◄");
+
+                            a.sendPacket(player);
+
+                        } );
+
+            }
+
+        }.runTaskTimerAsynchronously(PVP.getPlugin(), 2, 2);
 
     }
 
@@ -107,6 +158,7 @@ public class AntyLogoutListener implements Listener {
 
                     if ( now >= ent.getValue()){
                         ent.getKey().sendMessage(Help.color("&aNie jestes juz w walce - &emozesz sie wylogowac."));
+                        Bukkit.getPluginManager().callEvent(new AntyLogoutEndEvent(ent.getKey()));
                         return true;
                     }
                     return false;
@@ -118,5 +170,6 @@ public class AntyLogoutListener implements Listener {
         }.runTaskTimer(PVP.getPlugin(), 20, 20);
 
     }
+
 
 }

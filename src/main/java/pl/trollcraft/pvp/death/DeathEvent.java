@@ -1,15 +1,19 @@
 package pl.trollcraft.pvp.death;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.scoreboard.ScoreboardManager;
 import pl.trollcraft.pvp.PVP;
-import pl.trollcraft.pvp.help.ChatUtils;
-import pl.trollcraft.pvp.ranking.kills.KillsPosition;
-import pl.trollcraft.pvp.scoreboard.ScoreboardHandler;
+import pl.trollcraft.pvp.rankings.event.RankingRefreshEvent;
+import pl.trollcraft.pvp.rankings.kills.KillsRanking;
+
+import java.util.logging.Level;
 
 public class DeathEvent extends Event {
+
+    private static final KillsRanking killsRanking =
+            (KillsRanking) PVP.getPlugin().getRankingsManager().getRanking("kills").get();
 
     private final Player victim;
     private final Player killer;
@@ -18,22 +22,28 @@ public class DeathEvent extends Event {
         this.victim = victim;
         this.killer = killer;
 
-        int pos = PVP.getPlugin().getKillsRanking().demoteSwap(victim);
-        if (pos > -1)
-            ChatUtils.sendMessage(killer, ChatUtils.fixColor("&cSpadasz w rankingu na pozycje &e&l" + pos));
-
         if (killer != null){
 
-            PVP.getPlugin().getKillsRanking().get(killer).addKill();
-            pos = PVP.getPlugin().getKillsRanking().promoteSwap(killer);
-            if (pos > -1)
-                ChatUtils.sendMessage(killer, ChatUtils.fixColor("&aAwansujesz w rankingu na pozycje &e&l" + pos));
+            killsRanking.get(killer.getName()).ifPresent(dynPos -> {
+                int v = (int) dynPos.getPosition().val();
+
+                Bukkit.getLogger().log(Level.INFO, "Tried to promote.");
+
+                dynPos.getPosition().set(v + 1);
+
+                RankingRefreshEvent event = new RankingRefreshEvent(killer.getName(), killsRanking);
+                Bukkit.getPluginManager().callEvent(event);
+
+                killsRanking.tryPromote(dynPos.getPosition());
+            } );
 
         }
     }
 
     public Player getVictim() { return victim; }
     public Player getKiller() { return killer; }
+
+    // ---- ---- ---- ----
 
     private static final HandlerList handlers = new HandlerList();
 

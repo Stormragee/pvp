@@ -21,8 +21,9 @@ public class Warrior {
     private int highestKillStreak;
     private int deaths;
     private double kdr;
+    private int killPoints;
 
-    public Warrior(Player player, int level, int kills, int killStreak, int deaths, int highestKillStreak) {
+    public Warrior(Player player, int level, int kills, int killStreak, int deaths, int highestKillStreak, int killPoints) {
         this.player = player;
         this.level = level;
         nextLevel = LevelsManager.get(level + 1);
@@ -33,6 +34,8 @@ public class Warrior {
 
         if (deaths == 0) kdr = kills;
         else kdr = (double) kills/deaths;
+
+        this.killPoints = killPoints;
     }
 
     public Player getPlayer() { return player; }
@@ -64,6 +67,18 @@ public class Warrior {
         }
 
         updateKdr();
+    }
+
+    public void addKillPoints(int killPoints) {
+        this.killPoints += killPoints;
+    }
+
+    public void removeKillPoints(int killPoints) {
+        this.killPoints -= killPoints;
+    }
+
+    public int getKillPoints() {
+        return killPoints;
     }
 
     public void addDeath() { deaths++; killStreak = 0; updateKdr(); }

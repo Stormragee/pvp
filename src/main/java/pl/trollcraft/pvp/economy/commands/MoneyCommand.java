@@ -42,13 +42,13 @@ public class MoneyCommand implements CommandExecutor {
             Player player = Bukkit.getPlayer(args[0]);
             if (player == null || !player.isOnline()) {
 
-                YamlConfiguration conf = Configs.load("economy.yml");
+                /*YamlConfiguration conf = Configs.load("economy.yml");
                 if (!conf.contains("economy." + args[0]))
                     ChatUtils.sendMessage(sender, ChatUtils.fixColor("&cBrak gracza."));
                 else {
                     String money = conf.getString("economy." + args[0] + ".money");
                     ChatUtils.sendMessage(sender, ChatUtils.fixColor("&7&l[" + args[0] + "] &7" + money + " TC"));
-                }
+                }*/
 
             }
             else {

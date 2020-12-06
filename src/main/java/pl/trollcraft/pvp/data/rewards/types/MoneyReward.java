@@ -24,9 +24,10 @@ public class MoneyReward implements RewardType {
     }
 
     @Override
-    public void reward(Player player) {
+    public boolean reward(Player player) {
         EconomyProfile profile = EconomyManager.get(player);
         assert profile != null;
         profile.give(money);
+        return true;
     }
 }

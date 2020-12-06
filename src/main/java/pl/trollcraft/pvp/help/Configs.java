@@ -20,10 +20,7 @@ public class Configs {
         config = new YamlConfiguration();
         try {
             config.load(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InvalidConfigurationException e) {
+        } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
             return null;
         }

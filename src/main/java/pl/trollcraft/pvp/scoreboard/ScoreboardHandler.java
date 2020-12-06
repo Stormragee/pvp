@@ -4,13 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
-import pl.trollcraft.pvp.clans.Clan;
-import pl.trollcraft.pvp.clans.ClansManager;
+import pl.trollcraft.pvp.PVP;
 import pl.trollcraft.pvp.data.Warrior;
 import pl.trollcraft.pvp.data.WarriorsManager;
-import pl.trollcraft.pvp.help.Help;
-import pl.trollcraft.pvp.ranking.Ranking;
-import pl.trollcraft.pvp.ranking.RankingManager;
+import pl.trollcraft.pvp.rankings.Ranking;
 
 import java.util.logging.Level;
 
@@ -80,9 +77,8 @@ public class ScoreboardHandler {
         Score rankingName = obj.getScore("§7§lRanking");
         rankingName.setScore(2);
 
-        Ranking r = RankingManager.get("kills");
-        assert r != null;
-        int ind = r.getIndex(player);
+        Ranking r = (Ranking) PVP.getPlugin().getRankingsManager().getRanking("kills").get();
+        int ind = r.get(player.getName()).get().getIndex();
 
         Team ranking = board.registerNewTeam("ranking");
         ranking.addEntry(ChatColor.GRAY + "" + ChatColor.RED);
@@ -106,10 +102,9 @@ public class ScoreboardHandler {
         board.getTeam("killStreak").setPrefix("   §c§l" + warrior.getKillStreak());
         board.getTeam("toPromotion").setPrefix("   §c§l" + warrior.getKillsToPromotion());
 
-        Ranking ranking = RankingManager.get("kills");
-        assert ranking != null;
+        Ranking r = (Ranking) PVP.getPlugin().getRankingsManager().getRanking("kills").get();
+        int ind = r.get(player.getName()).get().getIndex();
 
-        int ind = ranking.getIndex(player);
         board.getTeam("ranking").setPrefix("   §c§l" + (ind+1));
     }
 

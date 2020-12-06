@@ -25,7 +25,11 @@ public class ItemsReward implements RewardType {
     }
 
     @Override
-    public void reward(Player player) {
-        player.getInventory().addItem(itemStack);
+    public boolean reward(Player player) {
+        return player.getInventory()
+                .addItem(itemStack)
+                .isEmpty();
     }
+
+
 }

@@ -88,7 +88,9 @@ public class AuctionView {
 
         if (viewer == null) {
             updating = false;
-            viewer = new Viewer(player, 0, new GUI(54, Help.color("&2&lAukcja")));
+            GUI gui = new GUI(54, Help.color("&2&lAukcja"));
+            gui.setAutoClose(true);
+            viewer = new Viewer(player, 0, gui);
             viewers.add(viewer);
         }
         else viewer.setPage(page);

@@ -9,6 +9,7 @@ import pl.trollcraft.pvp.data.events.AsyncWarriorLoadEvent;
 import pl.trollcraft.pvp.help.Configs;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class WarriorsManager {
 
@@ -30,6 +31,7 @@ public class WarriorsManager {
                 conf.set("warriors." + name + ".killStreak", warrior.getKillStreak());
                 conf.set("warriors." + name + ".deaths", warrior.getDeaths());
                 conf.set("warriors." + name + ".highestKillStreak", warrior.getHighestKillStreak());
+                conf.set("warriors." + name + ".killPoints", warrior.getKillPoints());
                 Configs.save(conf, "warriors.yml");
             }
 
@@ -40,6 +42,8 @@ public class WarriorsManager {
     public static void globalSave() {
         String name;
         YamlConfiguration conf = Configs.load("warriors.yml");
+        assert conf != null;
+
         for (Warrior warrior : warriors){
             name = warrior.getPlayer().getName();
             conf.set("warriors." + name + ".level", warrior.getLevel());
@@ -47,6 +51,7 @@ public class WarriorsManager {
             conf.set("warriors." + name + ".killStreak", warrior.getKillStreak());
             conf.set("warriors." + name + ".deaths", warrior.getDeaths());
             conf.set("warriors." + name + ".highestKillStreak", warrior.getHighestKillStreak());
+            conf.set("warriors." + name + ".killPoints", warrior.getKillPoints());
         }
         Configs.save(conf, "warriors.yml");
     }
@@ -60,9 +65,11 @@ public class WarriorsManager {
                 YamlConfiguration conf = Configs.load("warriors.yml");
                 String name = player.getName();
 
+                Bukkit.getLogger().log(Level.INFO, "Async loading...");
+
                 assert conf != null;
                 if (!conf.contains("warriors." + name)) {
-                    Warrior warrior = new Warrior(player, 1, 0, 0, 0, 0);
+                    Warrior warrior = new Warrior(player, 1, 0, 0, 0, 0, 500);
                     register(warrior);
                     Bukkit.getPluginManager().callEvent(new AsyncWarriorLoadEvent(warrior));
                 }
@@ -83,12 +90,19 @@ public class WarriorsManager {
                     else
                         highestKillStreak = 0;
 
-                    Warrior warrior = new Warrior(player, level, kills, killStreak, deaths, highestKillStreak);
+                    int killPoints;
+                    if (conf.contains("warriors." + name + ".killPoints"))
+                        killPoints = conf.getInt("warriors." + name + ".killPoints");
+                    else
+                        killPoints = 2 * kills;
+
+                    Warrior warrior = new Warrior(player, level, kills, killStreak, deaths, highestKillStreak, killPoints);
                     register(warrior);
 
                     Bukkit.getPluginManager().callEvent(new AsyncWarriorLoadEvent(warrior));
 
                 }
+
             }
 
         }.runTaskAsynchronously(PVP.getPlugin());

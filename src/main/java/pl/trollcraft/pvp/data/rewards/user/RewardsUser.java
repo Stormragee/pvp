@@ -13,4 +13,14 @@ public class RewardsUser {
         this.playerName = playerName;
         this.rewards = rewards;
     }
+
+    // ---- ---- ---- ----
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public List<Integer> getRewards() {
+        return rewards;
+    }
 }

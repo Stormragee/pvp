@@ -16,6 +16,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 import pl.trollcraft.pvp.PVP;
 import pl.trollcraft.pvp.help.ChatUtils;
 import pl.trollcraft.pvp.help.Help;
@@ -43,8 +44,10 @@ public class DeathListener implements Listener {
                 event.setCancelled(true);
                 victimPlayer.sendTitle(ChatUtils.fixColor("&cUmierasz"),
                         ChatUtils.fixColor("&e" + damagerPlayer.getName() + " &czabija Cie"));
+
                 Bukkit.getServer().getPluginManager().callEvent(
                         new DeathEvent(victimPlayer, damagerPlayer));
+
                 ScoreboardHandler.update(damagerPlayer);
                 ScoreboardHandler.update(victimPlayer);
             }
@@ -63,6 +66,7 @@ public class DeathListener implements Listener {
 
                 Bukkit.getServer().getPluginManager().callEvent(
                         new DeathEvent(victimPlayer, damagerPlayer));
+
                 ScoreboardHandler.update(damagerPlayer);
                 ScoreboardHandler.update(victimPlayer);
             }
@@ -72,9 +76,8 @@ public class DeathListener implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true)
     public void onDamage (EntityDamageEvent event) {
-        if (event.isCancelled()) return;
 
         if (event.getEntity().getType() != EntityType.PLAYER) return;
 
@@ -117,7 +120,6 @@ public class DeathListener implements Listener {
         if (player.getHealth() - finalDamage <= 0) {
 
             kill(player);
-
             return true;
 
         }
@@ -131,9 +133,18 @@ public class DeathListener implements Listener {
         player.setHealth(player.getMaxHealth());
         player.setFoodLevel(20);
         Drop.drop(player);
-        player.setFireTicks(1);
         player.setExp(0);
         player.setLevel(0);
+
+        player.setFireTicks(0);
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                player.setFireTicks(0);
+            }
+
+        }.runTaskLater(PVP.getPlugin(), 10);
 
         for(PotionEffect effect:player.getActivePotionEffects())
             player.removePotionEffect(effect.getType());

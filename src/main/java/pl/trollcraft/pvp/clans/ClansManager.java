@@ -16,9 +16,14 @@ public class ClansManager {
     private static double clanMoney;
     private static int clanKills;
 
-    private static ArrayList<Clan> clans = new ArrayList<>();
-    private static HashMap<Player, Clan> playerClans = new HashMap<>();
-    private static ArrayListMultimap<Player, Clan> playerInvitations = ArrayListMultimap.create();
+    private static final ArrayList<Clan> clans = new ArrayList<>();
+    private static final HashMap<Player, Clan> playerClans = new HashMap<>();
+
+    private static final ArrayListMultimap<Player, Clan> playerInvitations = ArrayListMultimap.create();
+
+    private static final ArrayListMultimap<Clan, Clan> capitulations = ArrayListMultimap.create();
+
+    // ---- ---- ---- ----
 
     public static void register(Clan clan) { clans.add(clan); }
     public static void register(Player player, Clan clan) { playerClans.put(player, clan); }
@@ -37,6 +42,8 @@ public class ClansManager {
         conf.set("clans." + clan.getId() + ".players", clan.getPlayers());
         conf.set("clans." + clan.getId() + ".kills", clan.getKills());
         conf.set("clans." + clan.getId() + ".deaths", clan.getDeaths());
+        conf.set("clans." + clan.getId() + ".level", clan.getLevel());
+        conf.set("clans." + clan.getId() + ".war", clan.getWar());
         Configs.save(conf, "clans.yml");
     }
 
@@ -48,12 +55,15 @@ public class ClansManager {
             conf.set("clans." + clan.getId() + ".players", clan.getPlayers());
             conf.set("clans." + clan.getId() + ".kills", clan.getKills());
             conf.set("clans." + clan.getId() + ".deaths", clan.getDeaths());
+            conf.set("clans." + clan.getId() + ".level", clan.getLevel());
+            conf.set("clans." + clan.getId() + ".war", clan.getWar());
         }
         Configs.save(conf, "clans.yml");
     }
 
     public static void load() {
         YamlConfiguration conf = Configs.load("clans.yml");
+        assert conf != null;
 
         clanMaxPlayers = conf.getInt("clan.max");
         clanMoney = conf.getDouble("clan.required.money");
@@ -65,9 +75,29 @@ public class ClansManager {
             List<String> players = conf.getStringList("clans." + id + ".players");
             int kills = conf.getInt("clans." + id + ".kills");
             int death = conf.getInt("clans." + id + ".death");
-            register(new Clan(Integer.parseInt(id), name, owner, players, kills, death));
+
+            int level;
+            if (conf.contains("clans." + id + ".level"))
+                level = conf.getInt("clans." + id + ".level");
+            else
+                level = 1;
+
+            List<Integer> war;
+            if (conf.contains("clans." + id + ".war"))
+                war = conf.getIntegerList("clans." + id + ".war");
+            else
+                war = new ArrayList<>();
+
+            register(new Clan(Integer.parseInt(id), name, owner, players, kills, death, level, war));
         } );
 
+    }
+
+    public static Clan get(int id) {
+        return clans.stream()
+                    .filter(c -> c.getId() == id)
+                    .findFirst()
+                    .orElse(null);
     }
 
     public static Clan get(Player player) {
@@ -88,12 +118,10 @@ public class ClansManager {
                 playerClans.put(player, clan);
                 return;
             }
-        return;
     }
 
     public static void unload(Player player) {
-        if (playerClans.containsKey(player))
-            playerClans.remove(player);
+        playerClans.remove(player);
     }
 
     public static void remove(Clan clan) {
@@ -108,12 +136,33 @@ public class ClansManager {
 
         player = Bukkit.getPlayer(clan.getOwner());
         if (player == null) return;
-        if (playerClans.containsKey(player))
-            playerClans.remove(player);
+        playerClans.remove(player);
 
         YamlConfiguration conf = Configs.load("clans.yml");
+        assert conf != null;
+
         conf.set("clans." + clan.getId(), null);
         Configs.save(conf, "clans.yml");
+    }
+
+    // Kebs -> /klan pokoj TC
+    // Data: <TC: <Kebs>>
+    // asking: kebs
+    // clan: tc
+    public static boolean peace(Clan asking, Clan clan) {
+        if (capitulations.containsEntry(asking, clan)) {
+            capitulations.remove(clan, asking);
+            capitulations.remove(asking, clan);
+
+            clan.getWar().remove(Integer.valueOf(asking.getId()));
+            asking.getWar().remove(Integer.valueOf(clan.getId()));
+
+            return true;
+        }
+
+        capitulations.put(clan, asking);
+
+        return false;
     }
 
     public static boolean invite(Player player, Clan clan) {

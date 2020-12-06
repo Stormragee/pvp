@@ -10,8 +10,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import pl.trollcraft.pvp.clans.event.ClanLevelUpEvent;
 import pl.trollcraft.pvp.clans.event.ClanMembersDamagePreventEvent;
 import pl.trollcraft.pvp.death.DeathEvent;
+import pl.trollcraft.pvp.help.Help;
 
 public class ClansListener implements Listener {
 
@@ -69,14 +71,32 @@ public class ClansListener implements Listener {
         Clan vClan = ClansManager.get(victim);
 
         if (kClan != null) {
+
+            if (vClan != null) {
+                if (kClan.getWar().contains(vClan.getId())) {
+                    kClan.addKill();
+                    killer.sendMessage(Help.color("&c&l+2 &aZabijasz gracza &ewrogiego klanu!"));
+                }
+            }
+
             kClan.addKill();
+
             if (kClan.getKills() % 10 == 0) ClansManager.save(kClan);
+
         }
 
         if (vClan != null) {
             vClan.addDeath();
             if (vClan.getDeaths() % 10 == 0) ClansManager.save(vClan);
         }
+
+    }
+
+    @EventHandler
+    public void onLevelUp (ClanLevelUpEvent event) {
+
+        Clan clan = event.getClan();
+        clan.announce("&aTwoj klan awansuje na &epoziom " + clan.getLevel(), true);
 
     }
 

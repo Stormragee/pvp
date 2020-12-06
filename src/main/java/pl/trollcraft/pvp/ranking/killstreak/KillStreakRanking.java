@@ -41,6 +41,9 @@ public class KillStreakRanking extends Ranking {
             position.setPrevious(positions.get(i+1));
             position.setNext(positions.get(i-1));
         }
+        
+        if (positions.isEmpty())
+            return;
 
         positions.get(0).setPrevious(positions.get(1));
         positions.get(positions.size()-1).setNext(positions.get(positions.size()-2));
@@ -56,7 +59,7 @@ public class KillStreakRanking extends Ranking {
                 return i+1;
             }
         }
-        position = new KillsPosition(name, 0);
+        position = new KillStreakPosition(name, 0);
         insertNew(player, position);
         playersPositions.put(player, position);
         return positions.size();

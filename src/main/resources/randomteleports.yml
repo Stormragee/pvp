@@ -1,0 +1,20 @@
+randomteleports:
+  '0':
+    world: Pustynia
+    min:
+      x: 100
+      z: 100
+    max:
+      x: 500
+      z: 500
+    offset:
+      min: 5
+      max: 20
+    teleport:
+      center:
+        world: Pustynia
+        x: 100
+        y: 65
+        z: 280
+      range: 5
+    interval: 10

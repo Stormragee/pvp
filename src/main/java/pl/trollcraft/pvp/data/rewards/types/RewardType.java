@@ -7,6 +7,14 @@ public interface RewardType {
     String name();
 
     void message(Player player);
-    void reward(Player player);
+
+    /**
+     * Gives the reward provided
+     * the player is able to get it.
+     *
+     * @param player to reward.
+     * @return if reward was given.
+     */
+    boolean reward(Player player);
 
 }

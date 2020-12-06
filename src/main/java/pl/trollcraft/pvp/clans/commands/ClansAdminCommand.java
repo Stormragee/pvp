@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import pl.trollcraft.pvp.clans.Clan;
 import pl.trollcraft.pvp.clans.ClansManager;
 import pl.trollcraft.pvp.help.ChatUtils;
+import pl.trollcraft.pvp.help.Help;
 
 public class ClansAdminCommand implements CommandExecutor {
 
@@ -41,6 +42,29 @@ public class ClansAdminCommand implements CommandExecutor {
                 ChatUtils.sendMessage(sender, ChatUtils.fixColor("&aUsunieto klan."));
 
                 return true;
+            }
+
+            else if (args[0].equalsIgnoreCase("addkills")) {
+
+                if (args.length != 3) {
+                    ChatUtils.sendMessage(sender, ChatUtils.fixColor("&eUzycie: &7/clanadmin addkills <klan> <n>"));
+                    return true;
+                }
+
+                Clan clan = ClansManager.get(args[1]);
+                if (clan == null) {
+                    ChatUtils.sendMessage(sender, ChatUtils.fixColor("&cKlan nie istnieje."));
+                    return true;
+                }
+
+                int kills = Integer.parseInt(args[2]);
+                while (kills > 0) {
+                    clan.addKill();
+                    kills--;
+                }
+
+                sender.sendMessage(Help.color("&aDodano zabojstwa."));
+
             }
 
         }

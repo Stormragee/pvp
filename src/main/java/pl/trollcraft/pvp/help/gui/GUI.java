@@ -60,7 +60,7 @@ public class GUI {
 
     public void close(Player player) {
         int id = player.getEntityId();
-        if (opened.containsKey(id)) opened.remove(id);
+        opened.remove(id);
     }
 
     public static GUI getOpened(Player player){

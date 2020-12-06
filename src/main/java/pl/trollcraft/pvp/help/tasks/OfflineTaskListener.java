@@ -4,6 +4,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import pl.trollcraft.pvp.PVP;
+import pl.trollcraft.pvp.economy.EconomyProfile;
+import pl.trollcraft.pvp.economy.events.AsyncEconomyLoadEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,22 +15,28 @@ import java.util.List;
 public class OfflineTaskListener implements Listener {
 
     @EventHandler
-    public void onJoin (PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        String playerName = player.getName();
+    public void onJoin (AsyncEconomyLoadEvent event) {
 
-        List<OfflineTask> disposal = new ArrayList<>();
+        EconomyProfile profile = event.getEconomyProfile();
+        Player player = profile.getPlayer();
 
-        OfflineTask.get(playerName).forEach( task -> {
+        OfflineTask.getOfflineTasks().removeIf(task -> {
 
-            if (task.execute(player))
-                disposal.add(task);
-            else
-                task.failure(player);
+            if (task.getPlayerName().equals(player.getName())) {
 
-        } );
+                if (task.execute(player)) {
+                    task.dispose();
+                    return true;
+                }
+                else
+                    task.failure(player);
 
-        disposal.forEach( OfflineTask::dispose );
+            }
+            return false;
+
+        });
+
+
     }
 
 }

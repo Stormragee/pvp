@@ -1,7 +1,10 @@
 package pl.trollcraft.pvp.antylogout;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import pl.trollcraft.pvp.antylogout.events.AntyLogoutEndEvent;
+import pl.trollcraft.pvp.antylogout.events.AntyLogoutInFightEvent;
 
 import java.util.HashMap;
 
@@ -32,6 +35,10 @@ public class AntyLogout {
         return INSTANCE;
     }
 
+    public long getCombatInterval() {
+        return combatInterval;
+    }
+
     /**
      * Gets the combat map.
      *
@@ -51,10 +58,13 @@ public class AntyLogout {
 
         if (combats.containsKey(player)) {
             combats.replace(player, System.currentTimeMillis() + combatInterval);
+            Bukkit.getPluginManager().callEvent(new AntyLogoutInFightEvent(player, combatInterval));
             return Response.UPDATED;
         }
 
         combats.put(player, System.currentTimeMillis() + combatInterval);
+        Bukkit.getPluginManager().callEvent(new AntyLogoutInFightEvent(player, combatInterval));
+
         return Response.ADDED;
 
     }

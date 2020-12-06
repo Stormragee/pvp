@@ -10,7 +10,7 @@ public class KillsManager {
 
     private static final long INTERVAL = 20 * 60 * 5;
 
-    private static HashMap<Player, Player> lastDamagers = new HashMap<>();
+    private final static HashMap<Player, Player> lastDamagers = new HashMap<>();
 
     public static Player getLastDamager(Player victim) {
         if (lastDamagers.containsKey(victim)) return lastDamagers.get(victim);
@@ -23,7 +23,7 @@ public class KillsManager {
     }
 
     public static void clear(Player victim) {
-        if (lastDamagers.containsKey(victim)) lastDamagers.remove(victim);
+        lastDamagers.remove(victim);
     }
 
     public static void listen() {
